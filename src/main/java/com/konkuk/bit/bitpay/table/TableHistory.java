@@ -25,4 +25,7 @@ public class TableHistory {
 
     @Column(name = "table_history_description")
     private String description;
+
+    // TODO
+    // 필요한거 추가
 }

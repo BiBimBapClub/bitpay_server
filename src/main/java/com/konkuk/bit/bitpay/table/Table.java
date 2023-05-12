@@ -19,6 +19,8 @@ public class Table {
     private Integer number;
     @Column(name = "table_status")
     private String status;
+    @Column(name = "table_description")
+    private String description;
     @CreatedDate
     @Column(name = "table_updated_time")
     private Date updatedTime;
