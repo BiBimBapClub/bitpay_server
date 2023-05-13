@@ -32,4 +32,14 @@ public class Order {
 
     @OneToMany
     private List<OrderDetail> detailList;
+
+    @Transient
+    public final static String STATUS_BEFORE_PAYMENT = "ORDER_STATUS_BEFORE_PAYMENT";
+    @Transient
+    public final static String STATUS_PREPARING = "ORDER_STATUS_PREPARING";
+    @Transient
+    public final static String STATUS_COMPLETE = "ORDER_STATUS_COMPLETE";
+    @Transient
+    public final static String STATUS_ALL = "ORDER_STATUS_ALL";
+
 }
