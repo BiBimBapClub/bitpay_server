@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.sql.Date;
+import java.util.UUID;
 
 @Builder
 @NoArgsConstructor
@@ -17,6 +18,8 @@ public class Table {
     @Id
     @Column(name = "table_number")
     private Integer number;
+    @Column(name = "table_uuid")
+    private UUID uuid;
     @Column(name = "table_status")
     private String status;
     @Column(name = "table_description")
