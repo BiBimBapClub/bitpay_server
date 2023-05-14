@@ -52,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
         for (OrderDetailCreateDto cdto : orderDetailList) {
             System.out.println(cdto);
             Long menuId = cdto.getMenu_id();
-            Integer quantity = cdto.getCounter();
+            Integer quantity = cdto.getCount();
             Menu menu = menuService.getMenuEntity(menuId);
 
             if (!menuService.updateMenuRemainStatus(menuId, quantity)) {
