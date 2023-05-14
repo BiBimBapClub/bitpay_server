@@ -17,7 +17,7 @@ public class TableInitializer implements CommandLineRunner {
 
     private final TableRedisRepository tableRepository;
 
-    private static final int MAX_TABLE_NUMBER = 35;
+    private static final int MAX_TABLE_NUMBER = 45;
 
 
     @Override
