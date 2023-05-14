@@ -18,6 +18,7 @@ public interface OrderService {
     boolean cancelOrder(Long orderId);
 
     // Order List
+    List<Order> getOrderListByStatus(String status);
     List<Order> getOrderListByTableNumber(Integer tableNumber);
     List<Order> getOrderListByTableNumberAndStatus(Integer tableNumber, String status);
 }

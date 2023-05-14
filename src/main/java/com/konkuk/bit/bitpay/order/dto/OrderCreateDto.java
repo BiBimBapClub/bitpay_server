@@ -10,6 +10,9 @@ import java.util.Map;
 @Getter @Setter
 @NoArgsConstructor
 public class OrderCreateDto {
-    private Map<Long,Integer> orderDetail;
+    /*
+        menuNumber, menuQuantity
+     */
+    private Map<Integer,Integer> orderDetail;
     private Integer tableNumber;
 }

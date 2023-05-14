@@ -1,6 +1,8 @@
 package com.konkuk.bit.bitpay.order.service;
 
 import com.konkuk.bit.bitpay.menu.Menu;
+import com.konkuk.bit.bitpay.menu.service.MenuService;
+import com.konkuk.bit.bitpay.menu.web.Dto.MenuResponseDto;
 import com.konkuk.bit.bitpay.order.domain.Order;
 import com.konkuk.bit.bitpay.order.domain.OrderDetail;
 import com.konkuk.bit.bitpay.order.dto.OrderCreateDto;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
+    private final MenuService menuService;
     private final OrderDetailRepository orderDetailRepository;
 
     @Override
@@ -31,24 +34,22 @@ public class OrderServiceImpl implements OrderService {
                 .tableNumber(dto.getTableNumber())
                 .build();
 
-        Map<Long, Integer> orderList = dto.getOrderDetail();
+        Map<Integer, Integer> orderList = dto.getOrderDetail();
 
         List<OrderDetail> detailList = new ArrayList<>();
 
         int totalPrice = 0;
-        for (Long menuId : orderList.keySet()) {
-            // TODO : MENU 받아오기
-            // TODO : MENU getter 요청
-            Menu menu = Menu.builder().number(  menuId).price(5000).build();
+        for (Integer menuId : orderList.keySet()) {
+            MenuResponseDto menu = menuService.getMenu(menuId);
             Integer quantity = orderList.get(menuId);
             OrderDetail orderDetail = OrderDetail.builder()
-                    .menuId(menu.getNumber())
+                    .menuId(menuId)
                     .order(order)
                     .quantity(quantity)
                     .build();
 
             detailList.add(orderDetailRepository.save(orderDetail));
-            totalPrice += quantity * 5000;
+            totalPrice += quantity * menu.getPrice();
         }
 
         order.setDetailList(detailList);
@@ -101,6 +102,14 @@ public class OrderServiceImpl implements OrderService {
         // TODO : table 에서도 지워주길 바람
 
         return true;
+    }
+
+    @Override
+    @Transactional
+    public List<Order> getOrderListByStatus(String status) {
+        return orderRepository.findAllByStatus(status).stream()
+                .sorted(Comparator.comparing(Order::getTimestamp))
+                .collect(Collectors.toList());
     }
 
     @Override
