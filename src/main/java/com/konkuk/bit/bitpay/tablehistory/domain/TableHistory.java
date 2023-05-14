@@ -1,9 +1,8 @@
 package com.konkuk.bit.bitpay.tablehistory.domain;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
-
-import java.util.Date;
 
 @Entity
 @Data
@@ -20,11 +19,16 @@ public class TableHistory {
     private Integer tableNumber;
 
     @Column(name = "table_history_timestamp")
-    private Date timestamp;
+    private LocalDateTime timestamp;
 
     @Column(name = "table_history_type")
     private String type;
 
     @Column(name = "table_history_description")
     private String description;
+
+    @PrePersist
+    public void timestamp() {
+        this.timestamp = LocalDateTime.now();
+    }
 }

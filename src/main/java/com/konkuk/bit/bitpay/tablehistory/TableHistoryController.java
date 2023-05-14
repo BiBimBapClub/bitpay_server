@@ -32,5 +32,4 @@ public class TableHistoryController {
     public ResponseEntity<Void> editTableStatus() {
 
     }
-
 }
