@@ -33,8 +33,10 @@ public class TableController {
         return tableService.updateTableStatus(tableNumber, status);
     }
 
+//    테이블 상태변경 {"청소완료"),("청소요청"),("사용중")}
+}
+
 //    @PostMapping("/{tableNumber}/move")
 //    public TableDto moveTable(@PathVariable Integer tableNumber, @RequestParam Integer newTableNumber) {
 //        return tableService.moveTable(tableNumber, newTableNumber);
 //    }
-}
