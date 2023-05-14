@@ -60,7 +60,7 @@ public class TableServiceImpl implements TableService{
             tableRepository.save(table);
             tableDto = convertToTableDto(table);
         }
-        tableHistoryService.createTableHistory(tableDto, "STATUS");
+        tableHistoryService.createTableHistory(tableDto, "ALL");
         return tableDto;
     }
 
@@ -204,8 +204,11 @@ public class TableServiceImpl implements TableService{
         if(!table.getStatus().contentEquals(TableStatus.CLEAN_REQUEST.getStatus())) throw new IllegalStateException();
 
         table.setStatus(TableStatus.CLEAN.getStatus());
+        table.setUuid(UUID.randomUUID());
         tableRepository.save(table);
-        return convertToTableDto(table);
+        TableDto tableDto = convertToTableDto(table);
+        tableHistoryService.createTableHistory(tableDto, "STATUS");
+        return tableDto;
     }
 
     @Override
@@ -218,7 +221,9 @@ public class TableServiceImpl implements TableService{
 
         table.setStatus(TableStatus.CLEAN_REQUEST.getStatus());
         tableRepository.save(table);
-        return convertToTableDto(table);
+        TableDto tableDto = convertToTableDto(table);
+        tableHistoryService.createTableHistory(tableDto, "STATUS");
+        return tableDto;
     }
 
     @Override
@@ -230,8 +235,11 @@ public class TableServiceImpl implements TableService{
         if(!table.getStatus().contentEquals(TableStatus.CLEAN.getStatus())) throw new IllegalStateException();
 
         table.setStatus(TableStatus.ACTIVE.getStatus());
+        table.setUpdatedTime(LocalDateTime.now());
         tableRepository.save(table);
-        return convertToTableDto(table);
+        TableDto tableDto = convertToTableDto(table);
+        tableHistoryService.createTableHistory(tableDto, "ALL");
+        return tableDto;
     }
 
     // 완전 초기값 설정해줘야함.
