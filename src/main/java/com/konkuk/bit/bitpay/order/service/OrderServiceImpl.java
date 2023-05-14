@@ -7,6 +7,7 @@ import com.konkuk.bit.bitpay.order.domain.OrderDetail;
 import com.konkuk.bit.bitpay.order.dto.OrderCreateDto;
 import com.konkuk.bit.bitpay.order.repository.OrderDetailRepository;
 import com.konkuk.bit.bitpay.order.repository.OrderRepository;
+import com.konkuk.bit.bitpay.table.service.TableService;
 import com.konkuk.bit.bitpay.tablehistory.service.TableHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final MenuService menuService;
     private final TableHistoryService tableHistoryService;
+    private final TableService tableService;
     private final OrderDetailRepository orderDetailRepository;
 
     @Override
@@ -69,6 +71,7 @@ public class OrderServiceImpl implements OrderService {
 
         Order saved = orderRepository.save(order);
         tableHistoryService.createOrderHistory(saved);
+        tableService.createOrderToTable(dto.getTableNumber(), saved.getId());
         return Optional.of(saved);
     }
 
@@ -113,8 +116,7 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = optionalOrder.get();
         orderRepository.delete(order);
-        // TODO : table 에서도 지워주길 바람
-
+        tableService.deleteOrderToTable(order.getTableNumber(), orderId);
         return true;
     }
 

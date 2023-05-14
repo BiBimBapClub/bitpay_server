@@ -3,16 +3,17 @@ package com.konkuk.bit.bitpay.tablehistory.service;
 import com.konkuk.bit.bitpay.menu.service.MenuService;
 import com.konkuk.bit.bitpay.order.domain.Order;
 import com.konkuk.bit.bitpay.order.domain.OrderDetail;
-import com.konkuk.bit.bitpay.table.TableDto;
+import com.konkuk.bit.bitpay.table.dto.TableDto;
 import com.konkuk.bit.bitpay.tablehistory.domain.TableHistory;
 import com.konkuk.bit.bitpay.tablehistory.dto.TableHistoryDto;
 import com.konkuk.bit.bitpay.tablehistory.repository.TableHistoryRepository;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +56,7 @@ public class TableHistoryServiceImpl implements TableHistoryService {
     @Override
     @Transactional
     public boolean createTableHistory(TableDto tableDto, String type) {
-        Integer tableNumber = tableDto.getNumber();
+        String tableNumber = tableDto.getNumber();
 
         //description에 들어가야 하는 것: table 상태 변경 내용, table 이용 시간 추가
         StringBuilder description = new StringBuilder();
