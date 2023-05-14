@@ -1,4 +1,4 @@
-package com.konkuk.bit.bitpay.table;
+package com.konkuk.bit.bitpay.table.domain;
 
 public enum TableStatus {
     CLEAN("청소완료"),
