@@ -35,7 +35,7 @@ public class OrderServiceImpl implements OrderService {
     public Optional<Order> createOrder(OrderCreateDto dto) {
 
         Order order = Order.builder()
-                .status(Order.STATUS_PREPARING)
+                .status(Order.STATUS_BEFORE_PAYMENT)
                 .timestamp(LocalDateTime.now())
                 .tableNumber(dto.getTableNumber())
                 .build();
