@@ -50,6 +50,7 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalArgumentException("주문 정보가 없음");
         }
         for (OrderDetailCreateDto cdto : orderDetailList) {
+            System.out.println(cdto);
             Long menuId = cdto.getMenu_id();
             Integer quantity = cdto.getCounter();
             Menu menu = menuService.getMenuEntity(menuId);
