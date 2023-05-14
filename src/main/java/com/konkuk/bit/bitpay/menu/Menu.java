@@ -16,7 +16,7 @@ import org.springframework.data.redis.core.RedisHash;
 public class Menu {
     @Id
     @Column(name = "menu_number")
-    private Long menuNumber;
+    private Long number;
     @Column(name = "menu_price")
     private Integer price;
     @Column(name = "menu_name")
