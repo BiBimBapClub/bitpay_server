@@ -2,6 +2,7 @@ package com.konkuk.bit.bitpay.menu.service;
 
 import com.konkuk.bit.bitpay.menu.domain.Menu;
 import com.konkuk.bit.bitpay.menu.domain.MenuRedisRepository;
+import com.konkuk.bit.bitpay.menu.domain.MenuType;
 import com.konkuk.bit.bitpay.menu.web.Dto.MenuResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -31,6 +33,20 @@ public class MenuServiceImpl implements MenuService {
                 .build();
     }
 
+    public void updateRedis(Integer orderCount, boolean isOk, Menu menu)
+    {
+        menu.update(orderCount,isOk);
+        menuRedisRepository.save(
+                Menu.builder()
+                        .number(menu.getNumber())
+                        .name(menu.getName())
+                        .price(menu.getPrice())
+                        .remain(menu.getRemain())
+                        .status(menu.isStatus())
+                        .type(menu.getType())
+                        .build()
+        );
+    }
     @Override
     @Transactional
     public boolean updateMenuRemainStatus(Long menuNumber, Integer orderCount) {
@@ -40,9 +56,9 @@ public class MenuServiceImpl implements MenuService {
         int remainCount = menu.getRemain() - orderCount;
 
         if(remainCount > 0) //잔여량이 주문 개수 보다 클 때
-            menu.update(orderCount,orderOK);
+            updateRedis(orderCount,orderOK,menu);
         else if(remainCount == 0) //잔여량이 주문 개수 보다 클 때
-            menu.update(orderCount,orderNotOK);
+            updateRedis(orderCount,orderNotOK,menu);
         else
             return false;
 
