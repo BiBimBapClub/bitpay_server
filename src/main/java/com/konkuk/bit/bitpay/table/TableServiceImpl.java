@@ -2,6 +2,7 @@ package com.konkuk.bit.bitpay.table;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.UUID;
 
 
 @RequiredArgsConstructor
+@Service
 public class TableServiceImpl implements TableService{
 
     private final RedisTemplate<String, Table> redisTemplate;
