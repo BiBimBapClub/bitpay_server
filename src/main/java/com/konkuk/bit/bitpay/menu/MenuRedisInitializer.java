@@ -45,7 +45,7 @@ public class MenuRedisInitializer {
                 Menu.builder()
                         .number(3L)
                         .name("너드세트2 (오돌뼈 + 주먹밥)")
-                        .price(25000)
+                        .price(13000)
                         .remain(MAX_REMAIN)
                         .status(true)
                         .type(MenuType.SET_MENU)
