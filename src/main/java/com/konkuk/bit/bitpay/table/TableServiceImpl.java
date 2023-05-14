@@ -1,9 +1,13 @@
 package com.konkuk.bit.bitpay.table;
 
+import com.konkuk.bit.bitpay.tablehistory.service.TableHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -11,77 +15,105 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class TableServiceImpl implements TableService{
 
     private final RedisTemplate<String, Table> redisTemplate;
+    private final TableHistoryService tableHistoryService;
     private static final int MAX_TABLE_NUMBER = 35;
+    private static final LocalTime INIT_TIME = LocalTime.of(2, 0);
 
     // 테이블 생성
     // 상태에 따라 테이블 생성하는 것 예외처리도 해야하나;;;
     @Override
+    @Transactional
     public TableDto createTable(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
         Table table = redisTemplate.opsForValue().get(key);
+
+        // 이미 해당 테이블 번호에 대한 정보가 Redis에 존재하는 경우
         if (table != null) {
-            // 이미 해당 테이블 번호에 대한 정보가 Redis에 존재하는 경우
-            // 테이블이 청소 다하고 받을 준비 되어있을 때로 해야함
-            table.setNumber(tableNumber);
-            table.setDescription("초기값");
-            table.setStatus("초기값");
+            // 테이블이 청소완료가 아니면 에외
+            if(!table.getStatus().contentEquals(TableStatus.CLEAN.getStatus())) throw new IllegalStateException();
+
+            //사용중
+            table.setStatus(TableStatus.ACTIVE.getStatus());
             table.setUuid(UUID.randomUUID());
+
         } else {
             // 해당 테이블 번호에 대한 정보가 Redis에 존재하지 않는 경우
             table = new Table();
             table.setNumber(tableNumber);
-            table.setDescription("새손님 들어왔습니다. description 여기에는 뭐 넣지");
-            table.setStatus("여기에 시간값 넣어놔야하나?");
+            table.setStatus(TableStatus.ACTIVE.getStatus());
             table.setUuid(UUID.randomUUID());
             redisTemplate.opsForValue().set(key, table);
         }
-        return convertToTableDto(table);
+        TableDto tableDto = convertToTableDto(table);
+        tableHistoryService.createTableHistory(tableDto, "STATUS");
+        return tableDto;
     }
 
     @Override
     public TableDto getTable(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
         Table table = redisTemplate.opsForValue().get(key);
-        if (table != null) {
-            return convertToTableDto(table);
-        }
-        // 예외처리 해야함.
-        return null;
+        if (table == null) throw new IllegalStateException();
+
+        return convertToTableDto(table);
     }
 
     // 테이블 상태 변경
     // 테이블의 어떤 상태에 따른 변경처리나 예외처리가 필요할 수 있음.
     @Override
+    @Transactional
     public TableDto updateTableStatus(Integer tableNumber, String newStatus) {
         String key = generateRedisKey(tableNumber);
         Table table = redisTemplate.opsForValue().get(key);
-        if (table != null) {
-            table.setStatus(newStatus);
+        if (table == null) throw new IllegalStateException();
+
+        if (isValidTableStatus(newStatus)) {
+            TableStatus status = TableStatus.valueOf(newStatus);
+            table.setStatus(status.getStatus());
             redisTemplate.opsForValue().set(key, table);
-            return convertToTableDto(table);
         }
-        // 예외처리 해야함.
-        return null;
+
+        TableDto tableDto = convertToTableDto(table);
+        tableHistoryService.createTableHistory(tableDto, "STATUS");
+        return tableDto;
+    }
+
+    @Override
+    @Transactional
+    public TableDto updateTableTime(Integer tableNumber, LocalDateTime interval) {
+        String key = generateRedisKey(tableNumber);
+        Table table = redisTemplate.opsForValue().get(key);
+        if (table == null) throw new IllegalStateException();
+        LocalDateTime updatedTime = table.getUpdatedTime();
+        LocalDateTime newTime = updatedTime.plusHours(interval.getHour())
+                .plusMinutes(interval.getMinute());
+        table.setUpdatedTime(newTime);
+
+        TableDto tableDto = convertToTableDto(table);
+        tableHistoryService.createTableHistory(tableDto, "TIME");
+        return tableDto;
     }
 
     // 테이블 옮기기
-    @Override
-    public TableDto moveTable(Integer tableNumber, Integer newTableNumber) {
-        String sourceKey = generateRedisKey(tableNumber);
-        String destinationKey = generateRedisKey(newTableNumber);
-        Table table = redisTemplate.opsForValue().get(sourceKey);
-        if (table != null) {
-            redisTemplate.opsForValue().set(destinationKey, table);
-            TableDto tableDto = convertToTableDto(table);
-            resetTable(table);
-            return tableDto;
-        }
-        //예외 처리 해야함.
-        return null;
-    }
+//    @Override
+//    @Transactional
+//    public TableDto moveTable(Integer tableNumber, Integer newTableNumber) {
+//        String sourceKey = generateRedisKey(tableNumber);
+//        String destinationKey = generateRedisKey(newTableNumber);
+//        Table table = redisTemplate.opsForValue().get(sourceKey);
+//        if (table != null) {
+//            redisTemplate.opsForValue().set(destinationKey, table);
+//            TableDto tableDto = convertToTableDto(table);
+//            resetTable(table);
+//            return tableDto;
+//        }
+//        //예외 처리 해야함.
+//        return null;
+//    }
 
     @Override
     public List<TableDto> getTableList() {
@@ -105,7 +137,6 @@ public class TableServiceImpl implements TableService{
         tableDto.setNumber(table.getNumber());
         tableDto.setUuid(table.getUuid());
         tableDto.setStatus(table.getStatus());
-        tableDto.setDescription(table.getDescription());
         tableDto.setUpdatedTime(table.getUpdatedTime());
         return tableDto;
     }
@@ -114,7 +145,15 @@ public class TableServiceImpl implements TableService{
     private void resetTable(Table table) {
         table.setUpdatedTime(null);
         table.setUuid(null);
-        table.setStatus("초기값");
-        table.setDescription("초기값");
+        table.setStatus(TableStatus.CLEAN.getStatus());
+    }
+
+    private boolean isValidTableStatus(String status) {
+        try {
+            TableStatus.valueOf(status);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 }

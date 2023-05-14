@@ -1,5 +1,6 @@
 package com.konkuk.bit.bitpay.table;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TableService {
@@ -10,7 +11,9 @@ public interface TableService {
 
     TableDto updateTableStatus(Integer tableNumber, String newStatus);
 
-    TableDto moveTable(Integer tableNumber, Integer newTableNumber);
+    TableDto updateTableTime(Integer tableNumber, LocalDateTime interval);
+
+//    TableDto moveTable(Integer tableNumber, Integer newTableNumber);
 
     List<TableDto> getTableList();
 }
