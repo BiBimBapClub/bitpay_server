@@ -1,4 +1,4 @@
-package com.konkuk.bit.bitpay.menu;
+package com.konkuk.bit.bitpay.menu.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,6 +25,9 @@ public class Menu {
     private Integer remain;
     @Column(name = "menu_status")
     private boolean status;
+
+    @Column(name = "menu_type")
+    private MenuType type;
 
     public void update(Integer orderCount, boolean status)
     {

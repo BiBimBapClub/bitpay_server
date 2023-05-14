@@ -1,6 +1,9 @@
 package com.konkuk.bit.bitpay.menu;
 
 
+import com.konkuk.bit.bitpay.menu.domain.Menu;
+import com.konkuk.bit.bitpay.menu.domain.MenuRedisRepository;
+import com.konkuk.bit.bitpay.menu.domain.MenuType;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -22,6 +25,7 @@ public class MenuRedisInitializer {
                         .price(48000)
                         .remain(MAX_REMAIN)
                         .status(true)
+                        .type(MenuType.SET_MENU)
                         .build()
         );
     }

@@ -1,10 +1,8 @@
 package com.konkuk.bit.bitpay.menu.service;
 
-import com.konkuk.bit.bitpay.menu.Menu;
-import com.konkuk.bit.bitpay.menu.MenuRedisRepository;
+import com.konkuk.bit.bitpay.menu.domain.Menu;
+import com.konkuk.bit.bitpay.menu.domain.MenuRedisRepository;
 import com.konkuk.bit.bitpay.menu.web.Dto.MenuResponseDto;
-import com.konkuk.bit.bitpay.menu.web.Dto.MenuUpdateDto;
-import com.konkuk.bit.bitpay.table.Table;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
