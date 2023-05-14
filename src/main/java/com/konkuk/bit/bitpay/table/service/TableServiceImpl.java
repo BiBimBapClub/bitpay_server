@@ -28,7 +28,7 @@ public class TableServiceImpl implements TableService{
     private final TableRedisRepository tableRepository;
     private final TableHistoryService tableHistoryService;
     private final OrderRepository orderRepository;
-    private static final int MAX_TABLE_NUMBER = 35;
+    private static final int MAX_TABLE_NUMBER = 45;
     private static final LocalTime INIT_TIME = LocalTime.of(2, 0);
 
     // 테이블 생성

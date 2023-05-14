@@ -62,29 +62,11 @@ public class OrderServiceImpl implements OrderService {
                 {13}
         };
 
-        int[] timeArr = {
-                0,
-                1,
-                1,
-                1,
-                1,
-                1,
-                0,
-                2,
-                2,
-                2,
-                0,
-                0,
-                0,
-                0
-        };
-
         int totalPrice = 0;
         if (orderDetailList == null) {
             throw new IllegalArgumentException("주문 정보가 없음");
         }
 
-        int flag = 0;
         for (OrderDetailCreateDto cdto : orderDetailList) {
             System.out.println(cdto);
             Long menuId = cdto.getMenu_id();
@@ -95,10 +77,6 @@ public class OrderServiceImpl implements OrderService {
                 if (!menuService.updateMenuRemainStatus(Long.valueOf(mId), quantity)) {
                     throw new IllegalArgumentException("수량 부족");
                 }
-            }
-
-            if (!tableService.isFirstOrder(dto.getTableNumber())) {
-                flag = Math.max(flag, timeArr[Math.toIntExact(menuId)]);
             }
 
             OrderDetail orderDetail = OrderDetail.builder()
@@ -118,17 +96,6 @@ public class OrderServiceImpl implements OrderService {
         tableHistoryService.createOrderHistory(saved);
         tableService.createOrderToTable(dto.getTableNumber(), saved.getId());
 
-        switch (flag) {
-            case 1:
-                tableService.updateTableTime(dto.getTableNumber(), LocalTime.of(1, 0));
-                break;
-            case 2:
-                tableService.updateTableTime(dto.getTableNumber(), LocalTime.of(0, 30));
-                break;
-            default:
-                break;
-        }
-
         return Optional.of(saved);
     }
 
@@ -144,7 +111,39 @@ public class OrderServiceImpl implements OrderService {
         if (!order.getStatus().equals(Order.STATUS_BEFORE_PAYMENT))
             throw new IllegalStateException("Invalid Request");
 
+        int[] timeArr = {
+                0,
+                2,
+                2,
+                2,
+                2,
+                2,
+                0,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0
+        };
+        int flag = 0;
+
         order.setStatus(Order.STATUS_PREPARING);
+
+        for (OrderDetail orderDetail : order.getDetailList()) {
+            flag = (int) Math.max(flag, orderDetail.getMenuId());
+        }
+        switch (flag) {
+            case 1:
+                tableService.updateTableTime(order.getTableNumber(), LocalTime.of(0, 30));
+                break;
+            case 2:
+                tableService.updateTableTime(order.getTableNumber(), LocalTime.of(1, 0));
+                break;
+            default:
+                break;
+        }
         return Optional.of(order);
     }
 
