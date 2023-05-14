@@ -17,8 +17,12 @@ public class MenuServiceImpl implements MenuService {
     private final MenuRedisRepository menuRedisRepository;
 
     @Override
+    public Menu getMenuEntity(Long menuNumber){
+        return menuRedisRepository.findById(menuNumber).orElseThrow(IllegalAccessError::new);
+    }
+    @Override
     public MenuResponseDto getMenu(Long menuNumber) {
-        Menu menu = menuRedisRepository.findById(menuNumber).orElseThrow(IllegalAccessError::new);
+        Menu menu = getMenuEntity(menuNumber);
         return MenuResponseDto.builder()
                 .remain(menu.getRemain())
                 .status(menu.isStatus())
@@ -27,8 +31,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public boolean updateMenuRemainStatus(Long menuNumber, Integer orderCount) {
-        Menu menu = menuRedisRepository.findById(menuNumber).orElseThrow(IllegalAccessError::new);
-        
+        Menu menu = getMenuEntity(menuNumber);
         return false;
     }
 
