@@ -1,5 +1,6 @@
-package com.konkuk.bit.bitpay.menu;
+package com.konkuk.bit.bitpay.menu.web;
 
+import com.konkuk.bit.bitpay.menu.Menu;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

@@ -2,17 +2,38 @@ package com.konkuk.bit.bitpay.order.controller;
 
 import com.konkuk.bit.bitpay.order.domain.Order;
 import com.konkuk.bit.bitpay.order.dto.OrderCreateDto;
+import com.konkuk.bit.bitpay.order.dto.OrderDto;
+import com.konkuk.bit.bitpay.order.service.OrderService;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/orders")
 public class OrderController {
 
-    @GetMapping("/")
-    public void getOrderList(
-            @RequestParam(required = true) Long tableNumber,
-            @RequestParam(required = false, defaultValue = Order.STATUS_ALL) String status) {
+    private final OrderService orderService;
 
+    @GetMapping("/")
+    public List<OrderDto> getOrderList(
+            @RequestParam(required = true) Integer tableNumber,
+            @RequestParam(required = false, defaultValue = Order.STATUS_ALL) String status,
+            HttpServletResponse response) {
+        if(tableNumber==null) {
+            return null;
+        }
+        if (status.equals(Order.STATUS_ALL)) {
+            return orderService.getOrderListByTableNumber(tableNumber).stream()
+                    .map(order->new OrderDto(order))
+                    .collect(Collectors.toList());
+        }
+        return orderService.getOrderListByTableNumberAndStatus(tableNumber,status).stream()
+                .map(order -> new OrderDto(order))
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/totalList")
