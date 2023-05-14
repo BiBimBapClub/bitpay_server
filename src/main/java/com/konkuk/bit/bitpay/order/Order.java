@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -22,13 +23,13 @@ public class Order {
     private Integer totalPrice;
 
     @Column(name = "order_timestamp")
-    private Date timestamp;
+    private LocalDateTime timestamp;
 
     @Column(name = "order_status")
     private String status;
 
-    @Column(name = "order_table_id")
-    private Integer tableId;
+    @Column(name = "order_table_number")
+    private Integer tableNumber;
 
     @OneToMany
     private List<OrderDetail> detailList;
@@ -41,5 +42,4 @@ public class Order {
     public final static String STATUS_COMPLETE = "ORDER_STATUS_COMPLETE";
     @Transient
     public final static String STATUS_ALL = "ORDER_STATUS_ALL";
-
 }
