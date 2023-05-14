@@ -1,7 +1,10 @@
 package com.konkuk.bit.bitpay.menu.service;
 
+import com.konkuk.bit.bitpay.menu.Menu;
+import com.konkuk.bit.bitpay.menu.MenuRedisRepository;
 import com.konkuk.bit.bitpay.menu.web.Dto.MenuResponseDto;
 import com.konkuk.bit.bitpay.menu.web.Dto.MenuUpdateDto;
+import com.konkuk.bit.bitpay.table.Table;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,19 +14,36 @@ import java.util.List;
 @Service
 public class MenuServiceImpl implements MenuService {
 
+    private final MenuRedisRepository menuRedisRepository;
+
     @Override
-    public boolean createMenu(Integer menuNumber) {
-        return false;
+    public Menu getMenuEntity(Long menuNumber){
+        return menuRedisRepository.findById(menuNumber).orElseThrow(IllegalAccessError::new);
+    }
+    @Override
+    public MenuResponseDto getMenu(Long menuNumber) {
+        Menu menu = getMenuEntity(menuNumber);
+        return MenuResponseDto.builder()
+                .remain(menu.getRemain())
+                .status(menu.isStatus())
+                .build();
     }
 
     @Override
-    public MenuResponseDto getMenu(Integer menuNumber) {
-        return null;
-    }
+    public boolean updateMenuRemainStatus(Long menuNumber, Integer orderCount) {
+        Menu menu = getMenuEntity(menuNumber);
+        final boolean orderOK = true;
+        final boolean orderNotOK = false;
+        int remainCount = menu.getRemain() - orderCount;
 
-    @Override
-    public boolean updateMenuRemainStatus(Integer menuNumber, MenuUpdateDto menuUpdateDto) {
-        return false;
+        if(remainCount > 0) //잔여량이 주문 개수 보다 클 때
+            menu.update(orderCount,orderOK);
+        else if(remainCount == 0) //잔여량이 주문 개수 보다 클 때
+            menu.update(orderCount,orderNotOK);
+        else
+            return false;
+        
+        return true;
     }
 
     @Override

@@ -19,18 +19,8 @@ public class MenuController {
 
     }
 
-    @PostMapping("/")
-    public void createMenu(@ModelAttribute Menu menu) {
-
-    }
-
-    @PostMapping("/{menu_id}")
+    @PutMapping("/{menu_id}")
     public void updateMenu(@PathVariable Long menu_id) {
-
-    }
-
-    @DeleteMapping("/{menu_id}")
-    public void deleteMenuById(@PathVariable Long menu_id) {
 
     }
 
