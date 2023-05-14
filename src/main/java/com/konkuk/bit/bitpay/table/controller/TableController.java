@@ -15,7 +15,7 @@ public class TableController {
     private final TableServiceImpl tableService;
 
 
-    @GetMapping("/")
+    @GetMapping("")
     public List<TableDto> getTableList() {
         return tableService.getTableList();
     }
