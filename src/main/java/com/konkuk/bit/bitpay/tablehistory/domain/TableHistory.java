@@ -15,7 +15,7 @@ public class TableHistory {
     @Column(name = "table_history_id")
     private Long id;
 
-    @Column(name = "table_number", unique = true)
+    @Column(name = "table_number")
     private Integer tableNumber;
 
     @Column(name = "table_history_timestamp")

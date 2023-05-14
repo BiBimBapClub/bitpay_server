@@ -21,7 +21,7 @@ public class TableHistoryController {
 
     }
 
-    //해당 테이블에 대한 주문 기록 로그 가져오기
+    //해당 테이블에 대한 모든 주문 기록 로그 가져오기 (시간 내림차순)
     @GetMapping("/history")
     public ResponseEntity<Void> getTableHistory(@RequestParam Integer tabledNumber) {
 
