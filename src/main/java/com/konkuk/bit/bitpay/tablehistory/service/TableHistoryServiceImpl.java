@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TableHistoryServiceImpl implements TableHistoryService {
 
     private final TableHistoryRepository tableHistoryRepository;
-    private final TableService tableService;
+//    private final TableService tableService;
 
     //Order가 들어왔을 때 해당 Order를 TableHistory에 반영하고, 해당 table의 상태도 반영
     @Override
