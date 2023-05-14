@@ -1,5 +1,6 @@
 package com.konkuk.bit.bitpay.table;
 
+import com.konkuk.bit.bitpay.tablehistory.service.TableHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class TableServiceImpl implements TableService{
 
     private final RedisTemplate<String, Table> redisTemplate;
+    private final TableHistoryService tableHistoryService;
     private static final int MAX_TABLE_NUMBER = 35;
     private static final LocalTime INIT_TIME = LocalTime.of(2, 0);
 
@@ -37,6 +39,7 @@ public class TableServiceImpl implements TableService{
             //사용중
             table.setStatus(TableStatus.ACTIVE.getStatus());
             table.setUuid(UUID.randomUUID());
+
         } else {
             // 해당 테이블 번호에 대한 정보가 Redis에 존재하지 않는 경우
             table = new Table();
@@ -45,7 +48,9 @@ public class TableServiceImpl implements TableService{
             table.setUuid(UUID.randomUUID());
             redisTemplate.opsForValue().set(key, table);
         }
-        return convertToTableDto(table);
+        TableDto tableDto = convertToTableDto(table);
+        tableHistoryService.createTableHistory(tableDto, "STATUS");
+        return tableDto;
     }
 
     @Override
@@ -72,7 +77,9 @@ public class TableServiceImpl implements TableService{
             redisTemplate.opsForValue().set(key, table);
         }
 
-        return convertToTableDto(table);
+        TableDto tableDto = convertToTableDto(table);
+        tableHistoryService.createTableHistory(tableDto, "STATUS");
+        return tableDto;
     }
 
     @Override
@@ -86,25 +93,27 @@ public class TableServiceImpl implements TableService{
                 .plusMinutes(interval.getMinute());
         table.setUpdatedTime(newTime);
 
-        return convertToTableDto(table);
+        TableDto tableDto = convertToTableDto(table);
+        tableHistoryService.createTableHistory(tableDto, "TIME");
+        return tableDto;
     }
 
     // 테이블 옮기기
-    @Override
-    @Transactional
-    public TableDto moveTable(Integer tableNumber, Integer newTableNumber) {
-        String sourceKey = generateRedisKey(tableNumber);
-        String destinationKey = generateRedisKey(newTableNumber);
-        Table table = redisTemplate.opsForValue().get(sourceKey);
-        if (table != null) {
-            redisTemplate.opsForValue().set(destinationKey, table);
-            TableDto tableDto = convertToTableDto(table);
-            resetTable(table);
-            return tableDto;
-        }
-        //예외 처리 해야함.
-        return null;
-    }
+//    @Override
+//    @Transactional
+//    public TableDto moveTable(Integer tableNumber, Integer newTableNumber) {
+//        String sourceKey = generateRedisKey(tableNumber);
+//        String destinationKey = generateRedisKey(newTableNumber);
+//        Table table = redisTemplate.opsForValue().get(sourceKey);
+//        if (table != null) {
+//            redisTemplate.opsForValue().set(destinationKey, table);
+//            TableDto tableDto = convertToTableDto(table);
+//            resetTable(table);
+//            return tableDto;
+//        }
+//        //예외 처리 해야함.
+//        return null;
+//    }
 
     @Override
     public List<TableDto> getTableList() {

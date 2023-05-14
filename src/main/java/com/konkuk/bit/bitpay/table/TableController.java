@@ -33,8 +33,8 @@ public class TableController {
         return tableService.updateTableStatus(tableNumber, status);
     }
 
-    @PostMapping("/{tableNumber}/move")
-    public TableDto moveTable(@PathVariable Integer tableNumber, @RequestParam Integer newTableNumber) {
-        return tableService.moveTable(tableNumber, newTableNumber);
-    }
+//    @PostMapping("/{tableNumber}/move")
+//    public TableDto moveTable(@PathVariable Integer tableNumber, @RequestParam Integer newTableNumber) {
+//        return tableService.moveTable(tableNumber, newTableNumber);
+//    }
 }

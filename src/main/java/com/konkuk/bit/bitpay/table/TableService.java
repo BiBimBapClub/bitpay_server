@@ -13,7 +13,7 @@ public interface TableService {
 
     TableDto updateTableTime(Integer tableNumber, LocalDateTime interval);
 
-    TableDto moveTable(Integer tableNumber, Integer newTableNumber);
+//    TableDto moveTable(Integer tableNumber, Integer newTableNumber);
 
     List<TableDto> getTableList();
 }
