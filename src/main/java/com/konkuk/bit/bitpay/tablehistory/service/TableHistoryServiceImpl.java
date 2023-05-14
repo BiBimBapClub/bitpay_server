@@ -57,16 +57,34 @@ public class TableHistoryServiceImpl implements TableHistoryService {
     @Transactional
     public boolean createTableHistory(TableDto tableDto, String type) {
         String tableNumber = tableDto.getNumber();
+        tableNumber = tableNumber.replace("table:", "");
 
         //description에 들어가야 하는 것: table 상태 변경 내용, table 이용 시간 추가
         StringBuilder description = new StringBuilder();
 
         if (type.equals("TIME")) {
+            description.append("주문으로 인한 시간 증가").append(tableDto.getUpdatedTime()).append("\n");
 
+            TableHistory tableHistory = TableHistory.builder()
+                    .tableNumber(Integer.valueOf(tableNumber))
+                    .type("TABLE")
+                    .description(description.toString())
+                    .build();
+
+            tableHistoryRepository.save(tableHistory);
         } else if (type.equals("STATUS")) {
+            description.append("테이블 상태 변경 => ").append(tableDto.getStatus()).append("\n");
 
+            TableHistory tableHistory = TableHistory.builder()
+                    .tableNumber(Integer.valueOf(tableNumber))
+                    .type("TABLE")
+                    .description(description.toString())
+                    .build();
+
+            tableHistoryRepository.save(tableHistory);
         }
-        return false;
+
+        return true;
     }
 
     @Override
