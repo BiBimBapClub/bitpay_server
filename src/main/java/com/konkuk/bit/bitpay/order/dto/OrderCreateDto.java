@@ -13,6 +13,6 @@ public class OrderCreateDto {
     /*
         menuNumber, menuQuantity
      */
-    private Map<Long,Integer> orderDetail;
+    private List<OrderDetailCreateDto> orderDetail;
     private Integer tableNumber;
 }
