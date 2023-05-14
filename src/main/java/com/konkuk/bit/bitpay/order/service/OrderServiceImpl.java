@@ -4,19 +4,15 @@ import com.konkuk.bit.bitpay.menu.Menu;
 import com.konkuk.bit.bitpay.order.domain.Order;
 import com.konkuk.bit.bitpay.order.domain.OrderDetail;
 import com.konkuk.bit.bitpay.order.dto.OrderCreateDto;
-import com.konkuk.bit.bitpay.order.dto.OrderUpdateDto;
 import com.konkuk.bit.bitpay.order.repository.OrderDetailRepository;
 import com.konkuk.bit.bitpay.order.repository.OrderRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -78,6 +74,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public Optional<Order> updateOrderStatusWithComplete(Long orderId) {
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
         // 1. 오더가 없을 때
@@ -93,17 +90,32 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public boolean cancelOrder(Long orderId) {
-        return false;
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+
+        if (optionalOrder.isEmpty()) return false;
+
+        Order order = optionalOrder.get();
+        orderRepository.delete(order);
+        // TODO : table 에서도 지워주길 바람
+
+        return true;
     }
 
     @Override
-    public List<Order> getOrderListByTableNumber(Long tableNumber) {
-        return null;
+    @Transactional(readOnly = true)
+    public List<Order> getOrderListByTableNumber(Integer tableNumber) {
+        return orderRepository.findAllByTableNumber(tableNumber).stream()
+                .sorted(Comparator.comparing(Order::getTimestamp))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Order> getOrderListByTableNumberAndStatus(Long tableNumber, String status) {
-        return null;
+    @Transactional(readOnly = true)
+    public List<Order> getOrderListByTableNumberAndStatus(Integer tableNumber, String status) {
+        return orderRepository.findAllByTableNumberAndStatus(tableNumber, status).stream()
+                .sorted(Comparator.comparing(Order::getTimestamp))
+                .collect(Collectors.toList());
     }
 }
