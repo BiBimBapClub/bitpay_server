@@ -17,4 +17,13 @@ public interface TableService {
 //    TableDto moveTable(Integer tableNumber, Integer newTableNumber);
 
     List<TableDto> getTableList();
+
+    TableDto confirmCleaned(Integer tableNumber);
+    TableDto confirmClean(Integer tableNumber);
+    TableDto confirmActive(Integer tableNumber);
+
+
+    Boolean createOrderToTable(Integer tableNumber, Long orderId);
+    Boolean deleteOrderToTable(Integer tableNumber, Long orderId);
+
 }

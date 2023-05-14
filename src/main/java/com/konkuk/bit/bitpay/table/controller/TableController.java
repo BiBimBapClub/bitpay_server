@@ -20,6 +20,22 @@ public class TableController {
         return tableService.getTableList();
     }
 
+    @PostMapping("/confirm_cleaned/{tableNumber}")
+    public TableDto confirmCleaned(@PathVariable Integer tableNumber){
+        return tableService.confirmCleaned(tableNumber);
+    }
+
+    @PostMapping("/confirm_clean/{tableNumber}")
+    public TableDto confirmClean(@PathVariable Integer tableNumber){
+        return tableService.confirmClean(tableNumber);
+    }
+
+    @PostMapping("/confirm_active/{tableNumber}")
+    public TableDto confirmActive(@PathVariable Integer tableNumber){
+        return tableService.confirmActive(tableNumber);
+    }
+
+
     @GetMapping("/{tableNumber}")
     public TableDto getTable(@PathVariable Integer tableNumber) {
         return tableService.getTable(tableNumber);
