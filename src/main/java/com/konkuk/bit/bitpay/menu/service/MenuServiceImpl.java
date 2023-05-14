@@ -1,13 +1,12 @@
 package com.konkuk.bit.bitpay.menu.service;
 
-import com.konkuk.bit.bitpay.menu.Menu;
-import com.konkuk.bit.bitpay.menu.MenuRedisRepository;
+import com.konkuk.bit.bitpay.menu.domain.Menu;
+import com.konkuk.bit.bitpay.menu.domain.MenuRedisRepository;
 import com.konkuk.bit.bitpay.menu.web.Dto.MenuResponseDto;
-import com.konkuk.bit.bitpay.menu.web.Dto.MenuUpdateDto;
-import com.konkuk.bit.bitpay.table.Table;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -42,12 +41,21 @@ public class MenuServiceImpl implements MenuService {
             menu.update(orderCount,orderNotOK);
         else
             return false;
-        
+
         return true;
     }
 
     @Override
     public List<MenuResponseDto> getMenuList() {
-        return null;
+        List<Menu> menuList = (List<Menu>) menuRedisRepository.findAll();
+        List<MenuResponseDto> responseList = new ArrayList<>();
+        for(Menu menu : menuList) {
+            MenuResponseDto dto = MenuResponseDto.builder()
+                    .remain(menu.getRemain())
+                    .status(menu.isStatus())
+                    .build();
+            responseList.add(dto);
+        }
+        return responseList;
     }
 }

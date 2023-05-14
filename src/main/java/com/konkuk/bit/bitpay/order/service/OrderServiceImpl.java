@@ -1,7 +1,7 @@
 package com.konkuk.bit.bitpay.order.service;
 
-import com.konkuk.bit.bitpay.menu.Menu;
 import com.konkuk.bit.bitpay.menu.service.MenuService;
+import com.konkuk.bit.bitpay.menu.domain.Menu;
 import com.konkuk.bit.bitpay.order.domain.Order;
 import com.konkuk.bit.bitpay.order.domain.OrderDetail;
 import com.konkuk.bit.bitpay.order.dto.OrderCreateDto;

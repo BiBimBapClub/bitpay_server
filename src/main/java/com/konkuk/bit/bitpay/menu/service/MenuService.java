@@ -1,8 +1,7 @@
 package com.konkuk.bit.bitpay.menu.service;
 
-import com.konkuk.bit.bitpay.menu.Menu;
+import com.konkuk.bit.bitpay.menu.domain.Menu;
 import com.konkuk.bit.bitpay.menu.web.Dto.MenuResponseDto;
-import com.konkuk.bit.bitpay.menu.web.Dto.MenuUpdateDto;
 
 import java.util.List;
 

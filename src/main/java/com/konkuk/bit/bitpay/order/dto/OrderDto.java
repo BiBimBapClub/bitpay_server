@@ -1,6 +1,5 @@
 package com.konkuk.bit.bitpay.order.dto;
 
-import com.konkuk.bit.bitpay.menu.Menu;
 import com.konkuk.bit.bitpay.order.domain.Order;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

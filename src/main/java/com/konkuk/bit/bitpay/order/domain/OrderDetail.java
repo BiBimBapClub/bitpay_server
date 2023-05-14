@@ -1,6 +1,5 @@
 package com.konkuk.bit.bitpay.order.domain;
 
-import com.konkuk.bit.bitpay.menu.Menu;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
