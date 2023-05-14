@@ -2,6 +2,7 @@ package com.konkuk.bit.bitpay.tablehistory.domain;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.*;
 
 @Entity
@@ -21,11 +22,18 @@ public class TableHistory {
     @Column(name = "table_history_timestamp")
     private LocalDateTime timestamp;
 
+    //order에 의한 type
+    //table에 의한 type
     @Column(name = "table_history_type")
     private String type;
 
+    //order에 의한 description: 주문한 내역, 총 주문 금액
+    //table에 의한 description: table 상태 변경 내용, table 이용 시간 추가
     @Column(name = "table_history_description")
     private String description;
+
+    @Column(name = "uuid")
+    private UUID uuid;
 
     @PrePersist
     public void timestamp() {

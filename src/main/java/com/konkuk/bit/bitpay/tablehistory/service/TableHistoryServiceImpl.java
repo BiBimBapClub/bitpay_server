@@ -1,8 +1,9 @@
 package com.konkuk.bit.bitpay.tablehistory.service;
 
 import com.konkuk.bit.bitpay.order.domain.Order;
+import com.konkuk.bit.bitpay.order.domain.OrderDetail;
+import com.konkuk.bit.bitpay.table.TableDto;
 import com.konkuk.bit.bitpay.table.TableService;
-import com.konkuk.bit.bitpay.table.TableServiceImpl;
 import com.konkuk.bit.bitpay.tablehistory.domain.TableHistory;
 import com.konkuk.bit.bitpay.tablehistory.repository.TableHistoryRepository;
 import java.util.List;
@@ -24,9 +25,31 @@ public class TableHistoryServiceImpl implements TableHistoryService {
     public boolean createOrderHistory(Order order) {
         Integer tableNumber = order.getTableNumber();
 
-        //TODO: table의 상태 변경
+        //description에 들어가야 하는 것: 주문한거, 총 주문금액
+        StringBuilder description = new StringBuilder();
 
+        List<OrderDetail> detailList = order.getDetailList();
+        for (OrderDetail orderDetail : detailList) {
 
+        }
+
+        description.append("총 주문금액: ").append(order.getTotalPrice());
+
+        return false;
+    }
+
+    @Override
+    public boolean createTableHistory(TableDto tableDto, String type) {
+        Integer tableNumber = tableDto.getNumber();
+
+        //description에 들어가야 하는 것: table 상태 변경 내용, table 이용 시간 추가
+        StringBuilder description = new StringBuilder();
+
+        if (type.equals("TIME")) {
+
+        } else if (type.equals("STATUS")) {
+
+        }
         return false;
     }
 
