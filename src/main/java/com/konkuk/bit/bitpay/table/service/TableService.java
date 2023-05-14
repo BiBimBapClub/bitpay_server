@@ -27,4 +27,6 @@ public interface TableService {
     Boolean createOrderToTable(Integer tableNumber, Long orderId);
     Boolean deleteOrderToTable(Integer tableNumber, Long orderId);
 
+    Boolean isFirstOrder(Integer tableNumber);
+
 }

@@ -152,6 +152,13 @@ public class TableServiceImpl implements TableService{
     }
 
     @Override
+    public Boolean isFirstOrder(Integer tableNumber) {
+        String key = generateRedisKey(tableNumber);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        return table.getOrders().size() == 0;
+    }
+
+    @Override
     public List<TableDto> getTableList() {
         List<TableDto> tableList = new ArrayList<>();
         for (int tableNumber = 1; tableNumber <= MAX_TABLE_NUMBER; tableNumber++) {
