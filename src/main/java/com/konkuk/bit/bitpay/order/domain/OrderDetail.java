@@ -1,4 +1,4 @@
-package com.konkuk.bit.bitpay.order;
+package com.konkuk.bit.bitpay.order.domain;
 
 import com.konkuk.bit.bitpay.menu.Menu;
 import jakarta.persistence.*;
