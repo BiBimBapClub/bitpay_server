@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +36,7 @@ public class OrderServiceImpl implements OrderService {
     public Optional<Order> createOrder(OrderCreateDto dto) {
 
         Order order = Order.builder()
-                .status(Order.STATUS_PREPARING)
+                .status(Order.STATUS_BEFORE_PAYMENT)
                 .timestamp(LocalDateTime.now())
                 .tableNumber(dto.getTableNumber())
                 .build();
@@ -44,18 +45,38 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderDetail> detailList = new ArrayList<>();
 
+        int[][] removeArr = {
+                {},
+                {8, 9},
+                {9},
+                {8},
+                {9},
+                {8},
+                {},
+                {},
+                {8},
+                {9},
+                {},
+                {11},
+                {12},
+                {13}
+        };
+
         int totalPrice = 0;
         if (orderDetailList == null) {
             throw new IllegalArgumentException("주문 정보가 없음");
         }
+
         for (OrderDetailCreateDto cdto : orderDetailList) {
             System.out.println(cdto);
             Long menuId = cdto.getMenu_id();
             Integer quantity = cdto.getCount();
             Menu menu = menuService.getMenuEntity(menuId);
 
-            if (!menuService.updateMenuRemainStatus(menuId, quantity)) {
-                throw new IllegalArgumentException("수량 부족");
+            for (int mId : removeArr[Math.toIntExact(menuId)]) {
+                if (!menuService.updateMenuRemainStatus(Long.valueOf(mId), quantity)) {
+                    throw new IllegalArgumentException("수량 부족");
+                }
             }
 
             OrderDetail orderDetail = OrderDetail.builder()
@@ -74,6 +95,7 @@ public class OrderServiceImpl implements OrderService {
         Order saved = orderRepository.save(order);
         tableHistoryService.createOrderHistory(saved);
         tableService.createOrderToTable(dto.getTableNumber(), saved.getId());
+
         return Optional.of(saved);
     }
 
@@ -89,7 +111,39 @@ public class OrderServiceImpl implements OrderService {
         if (!order.getStatus().equals(Order.STATUS_BEFORE_PAYMENT))
             throw new IllegalStateException("Invalid Request");
 
+        int[] timeArr = {
+                0,
+                2,
+                2,
+                2,
+                2,
+                2,
+                0,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0
+        };
+        int flag = 0;
+
         order.setStatus(Order.STATUS_PREPARING);
+
+        for (OrderDetail orderDetail : order.getDetailList()) {
+            flag = (int) Math.max(flag, orderDetail.getMenuId());
+        }
+        switch (flag) {
+            case 1:
+                tableService.updateTableTime(order.getTableNumber(), LocalTime.of(0, 30));
+                break;
+            case 2:
+                tableService.updateTableTime(order.getTableNumber(), LocalTime.of(1, 0));
+                break;
+            default:
+                break;
+        }
         return Optional.of(order);
     }
 
