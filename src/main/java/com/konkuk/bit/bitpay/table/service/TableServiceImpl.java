@@ -196,6 +196,7 @@ public class TableServiceImpl implements TableService{
         if(!table.getStatus().contentEquals(TableStatus.CLEAN_REQUEST.getStatus())) throw new IllegalStateException();
 
         table.setStatus(TableStatus.CLEAN.getStatus());
+        table.setUuid(UUID.randomUUID());
         tableRepository.save(table);
         TableDto tableDto = convertToTableDto(table);
         tableHistoryService.createTableHistory(tableDto, "STATUS");
@@ -226,7 +227,6 @@ public class TableServiceImpl implements TableService{
         if(!table.getStatus().contentEquals(TableStatus.CLEAN.getStatus())) throw new IllegalStateException();
 
         table.setStatus(TableStatus.ACTIVE.getStatus());
-        table.setUuid(UUID.randomUUID());
         table.setUpdatedTime(LocalDateTime.now());
         tableRepository.save(table);
         TableDto tableDto = convertToTableDto(table);
