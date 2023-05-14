@@ -1,6 +1,7 @@
-package com.konkuk.bit.bitpay.tablehistory;
+package com.konkuk.bit.bitpay.tablehistory.service;
 
 import com.konkuk.bit.bitpay.order.Order;
+import com.konkuk.bit.bitpay.tablehistory.repository.TableHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

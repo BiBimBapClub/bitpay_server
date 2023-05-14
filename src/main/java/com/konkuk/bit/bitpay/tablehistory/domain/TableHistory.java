@@ -1,13 +1,12 @@
-package com.konkuk.bit.bitpay.tablehistory;
+package com.konkuk.bit.bitpay.tablehistory.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 
 @Entity
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,7 +27,4 @@ public class TableHistory {
 
     @Column(name = "table_history_description")
     private String description;
-
-    // TODO
-    // 필요한거 추가
 }
