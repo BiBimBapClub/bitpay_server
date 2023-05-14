@@ -132,7 +132,7 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(Order.STATUS_PREPARING);
 
         for (OrderDetail orderDetail : order.getDetailList()) {
-            flag = (int) Math.max(flag, orderDetail.getMenuId());
+            flag = (int) Math.max(flag, timeArr[Math.toIntExact(orderDetail.getMenuId())]);
         }
         switch (flag) {
             case 1:
