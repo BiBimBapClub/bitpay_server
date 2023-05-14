@@ -3,7 +3,7 @@ package com.konkuk.bit.bitpay.tablehistory.service;
 import com.konkuk.bit.bitpay.menu.service.MenuService;
 import com.konkuk.bit.bitpay.order.domain.Order;
 import com.konkuk.bit.bitpay.order.domain.OrderDetail;
-import com.konkuk.bit.bitpay.table.TableDto;
+import com.konkuk.bit.bitpay.table.dto.TableDto;
 import com.konkuk.bit.bitpay.tablehistory.domain.TableHistory;
 import com.konkuk.bit.bitpay.tablehistory.dto.TableHistoryDto;
 import com.konkuk.bit.bitpay.tablehistory.repository.TableHistoryRepository;
@@ -55,17 +55,35 @@ public class TableHistoryServiceImpl implements TableHistoryService {
     @Override
     @Transactional
     public boolean createTableHistory(TableDto tableDto, String type) {
-        Integer tableNumber = tableDto.getNumber();
+        String tableNumber = tableDto.getNumber();
+        tableNumber = tableNumber.replace("table:", "");
 
         //description에 들어가야 하는 것: table 상태 변경 내용, table 이용 시간 추가
         StringBuilder description = new StringBuilder();
 
         if (type.equals("TIME")) {
+            description.append("주문으로 인한 시간 증가").append(tableDto.getUpdatedTime()).append("\n");
 
+            TableHistory tableHistory = TableHistory.builder()
+                    .tableNumber(Integer.valueOf(tableNumber))
+                    .type("TABLE")
+                    .description(description.toString())
+                    .build();
+
+            tableHistoryRepository.save(tableHistory);
         } else if (type.equals("STATUS")) {
+            description.append("테이블 상태 변경 => ").append(tableDto.getStatus()).append("\n");
 
+            TableHistory tableHistory = TableHistory.builder()
+                    .tableNumber(Integer.valueOf(tableNumber))
+                    .type("TABLE")
+                    .description(description.toString())
+                    .build();
+
+            tableHistoryRepository.save(tableHistory);
         }
-        return false;
+
+        return true;
     }
 
     @Override
