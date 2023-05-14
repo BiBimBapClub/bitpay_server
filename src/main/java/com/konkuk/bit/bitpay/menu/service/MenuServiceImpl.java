@@ -17,6 +17,9 @@ import java.util.Optional;
 public class MenuServiceImpl implements MenuService {
 
     private final MenuRedisRepository menuRedisRepository;
+    private final int ODOLBONE = 8;
+    private final int CHICKENFOOT = 8;
+
 
     @Override
     public Menu getMenuEntity(Long menuNumber){
@@ -58,7 +61,21 @@ public class MenuServiceImpl implements MenuService {
         if(remainCount > 0) //잔여량이 주문 개수 보다 클 때
             updateRedis(orderCount,orderOK,menu);
         else if(remainCount == 0) //잔여량이 주문 개수 보다 클 때
+        {
             updateRedis(orderCount,orderNotOK,menu);
+            if(menuNumber == ODOLBONE)
+            {
+                updateRedis(orderCount,orderNotOK,getMenuEntity(1L));
+                updateRedis(orderCount,orderNotOK,getMenuEntity(3L));
+                updateRedis(orderCount,orderNotOK,getMenuEntity(5L));
+            }
+            else if(menuNumber == CHICKENFOOT)
+            {
+                updateRedis(orderCount,orderNotOK,getMenuEntity(1L));
+                updateRedis(orderCount,orderNotOK,getMenuEntity(2L));
+                updateRedis(orderCount,orderNotOK,getMenuEntity(4L));
+            }
+        }
         else
             return false;
 
