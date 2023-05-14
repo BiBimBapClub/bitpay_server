@@ -50,6 +50,30 @@ jobs:
           username: ${{ secrets.USER }}
           script: |
             cd bitpay_server
+            dpkg -S /usr/bin/nohup
             chmod +x gradlew
             ./gradlew build -x check
-            nohup java -jar bitpay-0.0.0.jar & 
+            sudo nohup java -jar /build/libs/bitpay-0.0.0.jar &
+      - name: git back2 cloning...
+        uses: appleboy/ssh-action@master
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          host: ${{ secrets.BACK2_HOST }}
+          username: ${{ secrets.USER }}
+          script: |
+            cd bitpay_server
+            git reset --hard
+            git fetch
+            git pull
+      - name: Back2 Rebuilding...
+        uses: appleboy/ssh-action@master
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          host: ${{ secrets.BACK2_HOST }}
+          username: ${{ secrets.USER }}
+          script: |
+            cd bitpay_server
+            dpkg -S /usr/bin/nohup
+            chmod +x gradlew
+            ./gradlew build -x check
+            sudo nohup java -jar /build/libs/bitpay-0.0.0.jar &

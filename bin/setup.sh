@@ -11,11 +11,11 @@ sudo apt-get update && sudo apt-get upgrade -y
 # install jdk-17
 echo "==============InstallJDK17&nohup========="
 sudo apt install openjdk-17-jdk -y
-dpkg -S /usr/bin/nohup
 
 # build jar files
 echo "==============BuildJARfile========="
 cd ~/bitpay_server
+dpkg -S /usr/bin/nohup
 chmod +x gradlew
 ./gradlew build -x check
-nohup java -jar bitpay-0.0.0.jar &
+sudo nohup java -jar /build/libs/bitpay-0.0.0.jar &

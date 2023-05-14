@@ -75,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
 
             for (int mId : removeArr[Math.toIntExact(menuId)]) {
                 if (!menuService.updateMenuRemainStatus(Long.valueOf(mId), quantity)) {
-                    throw new IllegalArgumentException("수량 부족");
+                    throw new IllegalStateException("수량 부족");
                 }
             }
 
