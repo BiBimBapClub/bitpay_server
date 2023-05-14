@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface MenuService {
 
-    MenuResponseDto getMenu(Integer menuNumber);
+    MenuResponseDto getMenu(Long menuNumber);
 
-    boolean updateMenuRemainStatus(Integer menuNumber, MenuUpdateDto menuUpdateDto);
+    boolean updateMenuRemainStatus(Long menuNumber, MenuUpdateDto menuUpdateDto);
 
     List<MenuResponseDto> getMenuList();
 

@@ -17,7 +17,7 @@ public class MenuRedisInitializer {
     public void init() {
         menuRedisRepository.save(
                 Menu.builder()
-                        .menuNumber(1L)
+                        .number(1L)
                         .name("인싸세트(닭강정2 + 오뎅탕 + 오돌뼈 + 닭발 + 주먹밥2)")
                         .price(48000)
                         .remain(MAX_REMAIN)
