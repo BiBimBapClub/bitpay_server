@@ -37,7 +37,7 @@ public class TableServiceImpl implements TableService{
     @Transactional
     public TableDto createTable(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
-        Optional<Table> tableOptional = tableRepository.findByNumber(key);
+        Optional<Table> tableOptional = tableRepository.findById(key);
         TableDto tableDto = new TableDto();
         // 이미 해당 테이블 번호에 대한 정보가 Redis에 존재하는 경우
         if (tableOptional.isPresent()) {
@@ -65,7 +65,7 @@ public class TableServiceImpl implements TableService{
     @Override
     public TableDto getTable(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findByNumber(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
 
         return convertToTableDto(table);
     }
@@ -76,7 +76,7 @@ public class TableServiceImpl implements TableService{
     @Transactional
     public TableDto updateTableStatus(Integer tableNumber, String newStatus) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findByNumber(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
 
         if (isValidTableStatus(newStatus)) {
             TableStatus status = TableStatus.valueOf(newStatus);
@@ -124,7 +124,7 @@ public class TableServiceImpl implements TableService{
     @Transactional
     public Boolean createOrderToTable(Integer tableNumber, Long orderId) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findByNumber(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
         if (table.getOrders().contains(orderId)) {
             return false;
         }
@@ -136,7 +136,7 @@ public class TableServiceImpl implements TableService{
     @Transactional
     public Boolean deleteOrderToTable(Integer tableNumber, Long orderId) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findByNumber(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
         if(table.getOrders().contains(orderId))
             table.getOrders().remove(orderId);
         else
@@ -150,7 +150,7 @@ public class TableServiceImpl implements TableService{
         List<TableDto> tableList = new ArrayList<>();
         for (int tableNumber = 1; tableNumber <= MAX_TABLE_NUMBER; tableNumber++) {
             String key = generateRedisKey(tableNumber);
-            Optional<Table> optionalTable = tableRepository.findByNumber(key);
+            Optional<Table> optionalTable = tableRepository.findById(String.valueOf(tableNumber));
             optionalTable.ifPresent(table -> tableList.add(convertToTableDto(table)));
         }
         return tableList;
@@ -178,7 +178,7 @@ public class TableServiceImpl implements TableService{
     @Transactional
     public TableDto confirmCleaned(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findByNumber(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
 
         if(!table.getStatus().contentEquals(TableStatus.CLEAN_REQUEST.getStatus())) throw new IllegalStateException();
 
@@ -191,7 +191,7 @@ public class TableServiceImpl implements TableService{
     @Transactional
     public TableDto confirmClean(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findByNumber(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
 
         if(!table.getStatus().contentEquals(TableStatus.ACTIVE.getStatus())) throw new IllegalStateException();
 
@@ -204,7 +204,7 @@ public class TableServiceImpl implements TableService{
     @Transactional
     public TableDto confirmActive(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findByNumber(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
 
         if(!table.getStatus().contentEquals(TableStatus.CLEAN.getStatus())) throw new IllegalStateException();
 
