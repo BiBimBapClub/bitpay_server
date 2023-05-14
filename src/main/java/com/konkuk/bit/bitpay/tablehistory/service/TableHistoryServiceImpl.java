@@ -1,11 +1,13 @@
 package com.konkuk.bit.bitpay.tablehistory.service;
 
+import com.konkuk.bit.bitpay.menu.service.MenuService;
 import com.konkuk.bit.bitpay.order.domain.Order;
 import com.konkuk.bit.bitpay.order.domain.OrderDetail;
 import com.konkuk.bit.bitpay.table.TableDto;
-import com.konkuk.bit.bitpay.table.TableService;
 import com.konkuk.bit.bitpay.tablehistory.domain.TableHistory;
+import com.konkuk.bit.bitpay.tablehistory.dto.TableHistoryDto;
 import com.konkuk.bit.bitpay.tablehistory.repository.TableHistoryRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class TableHistoryServiceImpl implements TableHistoryService {
 
     private final TableHistoryRepository tableHistoryRepository;
-//    private final TableService tableService;
+    private final MenuService menuService;
 
-    //Order가 들어왔을 때 해당 Order를 TableHistory에 반영하고, 해당 table의 상태도 반영
+    //Order가 들어왔을 때 해당 Order를 TableHistory에 반영
     @Override
     @Transactional
     public boolean createOrderHistory(Order order) {
@@ -30,15 +32,28 @@ public class TableHistoryServiceImpl implements TableHistoryService {
 
         List<OrderDetail> detailList = order.getDetailList();
         for (OrderDetail orderDetail : detailList) {
+            Long menuId = orderDetail.getMenuId();
+            String menu = menuService.getMenuEntity(menuId).getName();
+            Integer quantity = orderDetail.getQuantity();
 
+            //menu1: n개, menu2: n개
+            description.append(menu).append(": ").append(quantity).append("개, ");
         }
+        description.append("총 주문금액: ").append(order.getTotalPrice()).append("\n");
 
-        description.append("총 주문금액: ").append(order.getTotalPrice());
+        TableHistory tableHistory = TableHistory.builder()
+                .tableNumber(tableNumber)
+                .description(description.toString())
+                .type("ORDER")
+                .build();
 
-        return false;
+        tableHistoryRepository.save(tableHistory);
+
+        return true;
     }
 
     @Override
+    @Transactional
     public boolean createTableHistory(TableDto tableDto, String type) {
         Integer tableNumber = tableDto.getNumber();
 
@@ -55,8 +70,16 @@ public class TableHistoryServiceImpl implements TableHistoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TableHistory> getHistories(Integer tableNumber) {
-       return tableHistoryRepository.findTableHistoriesByTableNumberOrderByTimestampDesc(tableNumber);
+    public List<TableHistoryDto> getHistories(Integer tableNumber) {
+        List<TableHistory> histories = tableHistoryRepository.findTableHistoriesByTableNumberOrderByTimestampDesc(
+                tableNumber);
+
+        List<TableHistoryDto> tableHistoryDtos = new ArrayList<>();
+        for (TableHistory history : histories) {
+            tableHistoryDtos.add(new TableHistoryDto(history));
+        }
+
+        return tableHistoryDtos;
     }
 
     @Override

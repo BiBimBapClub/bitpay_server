@@ -32,9 +32,6 @@ public class TableHistory {
     @Column(name = "table_history_description")
     private String description;
 
-    @Column(name = "uuid")
-    private UUID uuid;
-
     @PrePersist
     public void timestamp() {
         this.timestamp = LocalDateTime.now();
