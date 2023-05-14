@@ -19,9 +19,8 @@ public class OrderDetail {
     @Column(name = "order_detail_quantity")
     private Integer quantity;
 
-    @ManyToOne
-    @JoinColumn(name = "menu_id")
-    private Menu menu;
+    @Column(name = "order_detail_menu_id")
+    private Long menuId;
 
     @ManyToOne
     @JoinColumn(name = "order_id")

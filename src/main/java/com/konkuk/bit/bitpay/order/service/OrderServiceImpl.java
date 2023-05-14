@@ -42,7 +42,7 @@ public class OrderServiceImpl implements OrderService {
             Menu menu = Menu.builder().menuNumber(menuId).price(5000).build();
             Integer quantity = orderList.get(menuId);
             OrderDetail orderDetail = OrderDetail.builder()
-                    .menu(menu)
+                    .menuId(menu.getMenuNumber())
                     .order(order)
                     .quantity(quantity)
                     .build();
