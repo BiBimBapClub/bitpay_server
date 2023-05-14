@@ -11,6 +11,8 @@ sudo apt-get update && sudo apt-get upgrade -y
 # install jdk-17
 echo "==============InstallJDK17&nohup========="
 sudo apt install openjdk-17-jdk -y
+sudo apt-get install redis -y
+sudo redis-server
 
 # build jar files
 echo "==============BuildJARfile========="
