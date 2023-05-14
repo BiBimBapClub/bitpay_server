@@ -15,6 +15,11 @@ public class MenuController {
     // 메뉴 굳이 안내려주고 프론트에서 처리할 수 있는 처리
     private final MenuService menuService;
 
+
+    @PostMapping ("/{memberId}")
+    public boolean updateStatusMenuFalse(@PathVariable Long memberId) {
+        return menuService.updateStatusMenuFalse(memberId);
+    }
     @GetMapping("")
     public List<MenuResponseDto> getMenuList() {
         return menuService.getMenuList();

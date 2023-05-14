@@ -18,7 +18,13 @@ public class MenuServiceImpl implements MenuService {
 
     private final MenuRedisRepository menuRedisRepository;
     private final int ODOLBONE = 8;
-    private final int CHICKENFOOT = 8;
+    private final int CHICKENFOOT = 9;
+    private final int CHICKEN = 6;
+    private final int ODANNGTANG = 7;
+    private final int ZUMUCKBAB = 10;
+
+    private final boolean orderOK = true;
+    private final boolean orderNotOK = false;
 
 
     @Override
@@ -50,12 +56,39 @@ public class MenuServiceImpl implements MenuService {
                         .build()
         );
     }
+
+    @Override
+    public boolean updateStatusMenuFalse(Long menuNumber) {
+        Menu menu = getMenuEntity(menuNumber);
+        if(menu.isStatus() == false)
+            return false;
+        int orderCount = 0;
+        updateRedis(0,orderNotOK,menu);
+        if(menuNumber == CHICKEN)
+            updateRedis(orderCount,orderNotOK,getMenuEntity(1L));
+        if(menuNumber == ODANNGTANG)
+        {
+            updateRedis(orderCount,orderNotOK,getMenuEntity(1L));
+            updateRedis(orderCount,orderNotOK,getMenuEntity(4L));
+            updateRedis(orderCount,orderNotOK,getMenuEntity(5L));
+
+        }
+        if(menuNumber == ZUMUCKBAB)
+        {
+            updateRedis(orderCount,orderNotOK,getMenuEntity(1L));
+            updateRedis(orderCount,orderNotOK,getMenuEntity(2L));
+            updateRedis(orderCount,orderNotOK,getMenuEntity(3L));
+            updateRedis(orderCount,orderNotOK,getMenuEntity(4L));
+            updateRedis(orderCount,orderNotOK,getMenuEntity(5L));
+        }
+        return true;
+    }
+
     @Override
     @Transactional
     public boolean updateMenuRemainStatus(Long menuNumber, Integer orderCount) {
         Menu menu = getMenuEntity(menuNumber);
-        final boolean orderOK = true;
-        final boolean orderNotOK = false;
+
         int remainCount = menu.getRemain() - orderCount;
 
         if(remainCount > 0) //잔여량이 주문 개수 보다 클 때
