@@ -2,7 +2,6 @@ package com.konkuk.bit.bitpay.table.service;
 
 import com.konkuk.bit.bitpay.order.dto.OrderDto;
 import com.konkuk.bit.bitpay.order.repository.OrderRepository;
-import com.konkuk.bit.bitpay.order.service.OrderService;
 import com.konkuk.bit.bitpay.table.repository.TableRedisRepository;
 import com.konkuk.bit.bitpay.table.domain.TableStatus;
 import com.konkuk.bit.bitpay.table.domain.Table;
@@ -12,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,20 +88,20 @@ public class TableServiceImpl implements TableService{
         return tableDto;
     }
 
-//    @Transactional
-//    public TableDto updateTableTime(Integer tableNumber, LocalDateTime interval) {
-//        String key = generateRedisKey(tableNumber);
-//        Table table = tableRepository.findByNumber(key).orElseThrow(IllegalAccessError::new);
-//
-//        LocalDateTime updatedTime = table.getUpdatedTime();
-//        LocalDateTime newTime = updatedTime.plusHours(interval.getHour())
-//                .plusMinutes(interval.getMinute());
-//        table.setUpdatedTime(newTime);
-//
-//        TableDto tableDto = convertToTableDto(table);
-//        tableHistoryService.createTableHistory(tableDto, "TIME");
-//        return tableDto;
-//    }
+    @Transactional
+    public TableDto updateTableTime(Integer tableNumber, LocalTime interval) {
+        String key = generateRedisKey(tableNumber);
+        Table table = tableRepository.findByNumber(key).orElseThrow(IllegalAccessError::new);
+
+        LocalDateTime updatedTime = table.getUpdatedTime();
+        LocalDateTime newTime = updatedTime.plusHours(interval.getHour())
+                .plusMinutes(interval.getMinute());
+        table.setUpdatedTime(newTime);
+
+        TableDto tableDto = convertToTableDto(table);
+        tableHistoryService.createTableHistory(tableDto, "TIME");
+        return tableDto;
+    }
 
     // 테이블 옮기기
 //    @Transactional
