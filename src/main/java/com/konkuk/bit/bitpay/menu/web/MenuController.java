@@ -15,12 +15,12 @@ public class MenuController {
     // 메뉴 굳이 안내려주고 프론트에서 처리할 수 있는 처리
     private final MenuService menuService;
 
-    @GetMapping("/menus")
+    @GetMapping("")
     public List<MenuResponseDto> getMenuList() {
         return menuService.getMenuList();
     }
 
-    @GetMapping("/menus/{menu_id}")
+    @GetMapping("/{menu_id}")
     public MenuResponseDto getMenuById(@PathVariable Long menu_id) {
         return menuService.getMenu(menu_id);
     }
