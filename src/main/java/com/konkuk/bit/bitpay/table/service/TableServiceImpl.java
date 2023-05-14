@@ -121,6 +121,7 @@ public class TableServiceImpl implements TableService{
 
 
     @Override
+    @Transactional
     public Boolean createOrderToTable(Integer tableNumber, Long orderId) {
         String key = generateRedisKey(tableNumber);
         Table table = tableRepository.findByNumber(key).orElseThrow(IllegalAccessError::new);
@@ -132,6 +133,7 @@ public class TableServiceImpl implements TableService{
     }
 
     @Override
+    @Transactional
     public Boolean deleteOrderToTable(Integer tableNumber, Long orderId) {
         String key = generateRedisKey(tableNumber);
         Table table = tableRepository.findByNumber(key).orElseThrow(IllegalAccessError::new);
@@ -173,6 +175,7 @@ public class TableServiceImpl implements TableService{
     }
 
     @Override
+    @Transactional
     public TableDto confirmCleaned(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
         Table table = tableRepository.findByNumber(key).orElseThrow(IllegalAccessError::new);
@@ -185,6 +188,7 @@ public class TableServiceImpl implements TableService{
     }
 
     @Override
+    @Transactional
     public TableDto confirmClean(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
         Table table = tableRepository.findByNumber(key).orElseThrow(IllegalAccessError::new);
@@ -197,6 +201,7 @@ public class TableServiceImpl implements TableService{
     }
 
     @Override
+    @Transactional
     public TableDto confirmActive(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
         Table table = tableRepository.findByNumber(key).orElseThrow(IllegalAccessError::new);
