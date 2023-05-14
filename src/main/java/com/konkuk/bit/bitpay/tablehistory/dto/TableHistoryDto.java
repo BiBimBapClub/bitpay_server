@@ -2,6 +2,7 @@ package com.konkuk.bit.bitpay.tablehistory.dto;
 
 import com.konkuk.bit.bitpay.tablehistory.domain.TableHistory;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.Data;
 
 @Data
@@ -12,6 +13,7 @@ public class TableHistoryDto {
     private LocalDateTime timestamp;
     private String type;
     private String description;
+    private UUID uuid;
 
     public TableHistoryDto(TableHistory source) {
         this.id = source.getId();
@@ -19,5 +21,6 @@ public class TableHistoryDto {
         this.timestamp = source.getTimestamp();
         this.type = source.getType();
         this.description = source.getDescription();
+        this.uuid = source.getUuid();
     }
 }

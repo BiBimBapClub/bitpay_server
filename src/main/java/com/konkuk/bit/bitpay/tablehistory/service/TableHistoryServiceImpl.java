@@ -82,6 +82,17 @@ public class TableHistoryServiceImpl implements TableHistoryService {
                     .build();
 
             tableHistoryRepository.save(tableHistory);
+        } else if (type.equals("ALL")) {
+            description.append("주문으로 인한 시간 증가").append(tableDto.getUpdatedTime());
+            description.append(", 테이블 상태 변경 => ").append(tableDto.getStatus()).append("\n");
+
+            TableHistory tableHistory = TableHistory.builder()
+                    .tableNumber(Integer.valueOf(tableNumber))
+                    .type("TABLE")
+                    .description(description.toString())
+                    .build();
+
+            tableHistoryRepository.save(tableHistory);
         }
 
         return true;
