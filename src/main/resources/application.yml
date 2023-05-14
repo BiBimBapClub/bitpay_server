@@ -4,22 +4,15 @@ spring:
     redis:
       host: localhost
       port: 6379
-  datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:test;MODE=MySQL;
-    username: sa
-    password:
 
-  h2:
-    console:
-      enabled: true
-      settings:
-        web-allow-others: true
 
   jpa:
-    database: h2
+    database: mysql
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
+
+  profiles:
+    include: auth
 
 server:
   port: 80

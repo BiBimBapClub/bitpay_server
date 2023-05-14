@@ -30,6 +30,4 @@ public class MenuController {
         return menuService.getMenu(menu_id);
     }
 
-
-
 }

@@ -29,7 +29,7 @@ public class Order {
     @Column(name = "order_table_number")
     private Integer tableNumber;
 
-    @OneToMany
+    @OneToMany(mappedBy = "order")
     private List<OrderDetail> detailList;
 
     @Transient
