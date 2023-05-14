@@ -15,7 +15,7 @@ dpkg -S /usr/bin/nohup
 
 # build jar files
 echo "==============BuildJARfile========="
-cd ~/bitpay-server
+cd ~/bitpay_server
 chmod +x gradlew
 ./gradlew build -x check
 nohup java -jar complete-v1.0.0.jar & 
