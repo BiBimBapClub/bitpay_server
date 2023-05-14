@@ -1,7 +1,7 @@
 package com.konkuk.bit.bitpay.tablehistory.service;
 
 import com.konkuk.bit.bitpay.order.domain.Order;
-import com.konkuk.bit.bitpay.table.TableDto;
+import com.konkuk.bit.bitpay.table.dto.TableDto;
 import com.konkuk.bit.bitpay.tablehistory.domain.TableHistory;
 import com.konkuk.bit.bitpay.tablehistory.dto.TableHistoryDto;
 import java.util.List;

@@ -1,16 +1,23 @@
-package com.konkuk.bit.bitpay.table;
+package com.konkuk.bit.bitpay.table.service;
 
+import com.konkuk.bit.bitpay.order.dto.OrderDto;
+import com.konkuk.bit.bitpay.order.repository.OrderRepository;
+import com.konkuk.bit.bitpay.order.service.OrderService;
+import com.konkuk.bit.bitpay.table.repository.TableRedisRepository;
+import com.konkuk.bit.bitpay.table.domain.TableStatus;
+import com.konkuk.bit.bitpay.table.domain.Table;
+import com.konkuk.bit.bitpay.table.dto.TableDto;
 import com.konkuk.bit.bitpay.tablehistory.service.TableHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor
@@ -20,6 +27,7 @@ public class TableServiceImpl implements TableService{
 
     private final TableRedisRepository tableRepository;
     private final TableHistoryService tableHistoryService;
+    private final OrderRepository orderRepository;
     private static final int MAX_TABLE_NUMBER = 35;
     private static final LocalTime INIT_TIME = LocalTime.of(2, 0);
 
@@ -28,7 +36,8 @@ public class TableServiceImpl implements TableService{
     @Override
     @Transactional
     public TableDto createTable(Integer tableNumber) {
-        Optional<Table> tableOptional = tableRepository.findByNumber(tableNumber);
+        String key = generateRedisKey(tableNumber);
+        Optional<Table> tableOptional = tableRepository.findById(key);
         TableDto tableDto = new TableDto();
         // 이미 해당 테이블 번호에 대한 정보가 Redis에 존재하는 경우
         if (tableOptional.isPresent()) {
@@ -43,7 +52,7 @@ public class TableServiceImpl implements TableService{
         } else {
             // 해당 테이블 번호에 대한 정보가 Redis에 존재하지 않는 경우
             Table table = new Table();
-            table.setNumber(tableNumber);
+            table.setNumber(key);
             table.setStatus(TableStatus.ACTIVE.getStatus());
             table.setUuid(UUID.randomUUID());
             tableRepository.save(table);
@@ -55,7 +64,8 @@ public class TableServiceImpl implements TableService{
 
     @Override
     public TableDto getTable(Integer tableNumber) {
-        Table table = tableRepository.findByNumber(tableNumber).orElseThrow(IllegalAccessError::new);
+        String key = generateRedisKey(tableNumber);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
 
         return convertToTableDto(table);
     }
@@ -65,7 +75,8 @@ public class TableServiceImpl implements TableService{
     @Override
     @Transactional
     public TableDto updateTableStatus(Integer tableNumber, String newStatus) {
-        Table table = tableRepository.findByNumber(tableNumber).orElseThrow(IllegalAccessError::new);
+        String key = generateRedisKey(tableNumber);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
 
         if (isValidTableStatus(newStatus)) {
             TableStatus status = TableStatus.valueOf(newStatus);
@@ -77,23 +88,22 @@ public class TableServiceImpl implements TableService{
         return tableDto;
     }
 
-    @Override
-    @Transactional
-    public TableDto updateTableTime(Integer tableNumber, LocalDateTime interval) {
-        Table table = tableRepository.findByNumber(tableNumber).orElseThrow(IllegalAccessError::new);
-
-        LocalDateTime updatedTime = table.getUpdatedTime();
-        LocalDateTime newTime = updatedTime.plusHours(interval.getHour())
-                .plusMinutes(interval.getMinute());
-        table.setUpdatedTime(newTime);
-
-        TableDto tableDto = convertToTableDto(table);
-        tableHistoryService.createTableHistory(tableDto, "TIME");
-        return tableDto;
-    }
+//    @Transactional
+//    public TableDto updateTableTime(Integer tableNumber, LocalDateTime interval) {
+//        String key = generateRedisKey(tableNumber);
+//        Table table = tableRepository.findByNumber(key).orElseThrow(IllegalAccessError::new);
+//
+//        LocalDateTime updatedTime = table.getUpdatedTime();
+//        LocalDateTime newTime = updatedTime.plusHours(interval.getHour())
+//                .plusMinutes(interval.getMinute());
+//        table.setUpdatedTime(newTime);
+//
+//        TableDto tableDto = convertToTableDto(table);
+//        tableHistoryService.createTableHistory(tableDto, "TIME");
+//        return tableDto;
+//    }
 
     // 테이블 옮기기
-//    @Override
 //    @Transactional
 //    public TableDto moveTable(Integer tableNumber, Integer newTableNumber) {
 //        String sourceKey = generateRedisKey(tableNumber);
@@ -109,14 +119,39 @@ public class TableServiceImpl implements TableService{
 //        return null;
 //    }
 
+
+    @Override
+    @Transactional
+    public Boolean createOrderToTable(Integer tableNumber, Long orderId) {
+        String key = generateRedisKey(tableNumber);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        if (table.getOrders().contains(orderId)) {
+            return false;
+        }
+        table.getOrders().add(orderId);
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public Boolean deleteOrderToTable(Integer tableNumber, Long orderId) {
+        String key = generateRedisKey(tableNumber);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        if(table.getOrders().contains(orderId))
+            table.getOrders().remove(orderId);
+        else
+            return false;
+
+        return true;
+    }
+
     @Override
     public List<TableDto> getTableList() {
         List<TableDto> tableList = new ArrayList<>();
         for (int tableNumber = 1; tableNumber <= MAX_TABLE_NUMBER; tableNumber++) {
-            Table table = tableRepository.findByNumber(tableNumber).orElseThrow();
-            if (table != null) {
-                tableList.add(convertToTableDto(table));
-            }
+            String key = generateRedisKey(tableNumber);
+            Optional<Table> optionalTable = tableRepository.findById(key);
+            optionalTable.ifPresent(table -> tableList.add(convertToTableDto(table)));
         }
         return tableList;
     }
@@ -131,7 +166,51 @@ public class TableServiceImpl implements TableService{
         tableDto.setUuid(table.getUuid());
         tableDto.setStatus(table.getStatus());
         tableDto.setUpdatedTime(table.getUpdatedTime());
+        Integer value = Integer.parseInt(tableDto.getNumber().substring("table:".length()));
+        List<OrderDto> orderDtoList = orderRepository.findAllByTableNumber(value).stream()
+                .map(o -> new OrderDto(o))
+                .collect(Collectors.toList());
+        tableDto.setOrders(orderDtoList);
         return tableDto;
+    }
+
+    @Override
+    @Transactional
+    public TableDto confirmCleaned(Integer tableNumber) {
+        String key = generateRedisKey(tableNumber);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+
+        if(!table.getStatus().contentEquals(TableStatus.CLEAN_REQUEST.getStatus())) throw new IllegalStateException();
+
+        table.setStatus(TableStatus.CLEAN.getStatus());
+
+        return convertToTableDto(table);
+    }
+
+    @Override
+    @Transactional
+    public TableDto confirmClean(Integer tableNumber) {
+        String key = generateRedisKey(tableNumber);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+
+        if(!table.getStatus().contentEquals(TableStatus.ACTIVE.getStatus())) throw new IllegalStateException();
+
+        table.setStatus(TableStatus.CLEAN_REQUEST.getStatus());
+
+        return convertToTableDto(table);
+    }
+
+    @Override
+    @Transactional
+    public TableDto confirmActive(Integer tableNumber) {
+        String key = generateRedisKey(tableNumber);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+
+        if(!table.getStatus().contentEquals(TableStatus.CLEAN.getStatus())) throw new IllegalStateException();
+
+        table.setStatus(TableStatus.ACTIVE.getStatus());
+
+        return convertToTableDto(table);
     }
 
     // 완전 초기값 설정해줘야함.
@@ -149,4 +228,6 @@ public class TableServiceImpl implements TableService{
             return false;
         }
     }
+
+
 }

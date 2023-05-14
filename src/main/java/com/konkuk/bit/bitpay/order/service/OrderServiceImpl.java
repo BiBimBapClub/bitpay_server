@@ -5,8 +5,10 @@ import com.konkuk.bit.bitpay.menu.domain.Menu;
 import com.konkuk.bit.bitpay.order.domain.Order;
 import com.konkuk.bit.bitpay.order.domain.OrderDetail;
 import com.konkuk.bit.bitpay.order.dto.OrderCreateDto;
+import com.konkuk.bit.bitpay.order.dto.OrderDetailCreateDto;
 import com.konkuk.bit.bitpay.order.repository.OrderDetailRepository;
 import com.konkuk.bit.bitpay.order.repository.OrderRepository;
+import com.konkuk.bit.bitpay.table.service.TableService;
 import com.konkuk.bit.bitpay.tablehistory.service.TableHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final MenuService menuService;
     private final TableHistoryService tableHistoryService;
+    private final TableService tableService;
     private final OrderDetailRepository orderDetailRepository;
 
     @Override
@@ -38,17 +41,19 @@ public class OrderServiceImpl implements OrderService {
                 .tableNumber(dto.getTableNumber())
                 .build();
 
-        Map<Long, Integer> orderList = dto.getOrderDetail();
+        List<OrderDetailCreateDto> orderDetailList = dto.getOrderDetail();
 
         List<OrderDetail> detailList = new ArrayList<>();
 
         int totalPrice = 0;
-        if (orderList == null) {
+        if (orderDetailList == null) {
             throw new IllegalArgumentException("주문 정보가 없음");
         }
-        for (Long menuId : orderList.keySet()) {
+        for (OrderDetailCreateDto cdto : orderDetailList) {
+            System.out.println(cdto);
+            Long menuId = cdto.getMenu_id();
+            Integer quantity = cdto.getCounter();
             Menu menu = menuService.getMenuEntity(menuId);
-            Integer quantity = orderList.get(menuId);
 
             if (!menuService.updateMenuRemainStatus(menuId, quantity)) {
                 throw new IllegalArgumentException("수량 부족");
@@ -69,6 +74,7 @@ public class OrderServiceImpl implements OrderService {
 
         Order saved = orderRepository.save(order);
         tableHistoryService.createOrderHistory(saved);
+        tableService.createOrderToTable(dto.getTableNumber(), saved.getId());
         return Optional.of(saved);
     }
 
@@ -113,8 +119,7 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = optionalOrder.get();
         orderRepository.delete(order);
-        // TODO : table 에서도 지워주길 바람
-
+        tableService.deleteOrderToTable(order.getTableNumber(), orderId);
         return true;
     }
 
