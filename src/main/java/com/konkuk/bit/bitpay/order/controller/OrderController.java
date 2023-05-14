@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,6 +19,12 @@ import java.util.stream.Collectors;
 public class OrderController {
 
     private final OrderService orderService;
+
+    private void setResponse(HttpServletResponse response, int sc, String msg) throws IOException {
+        response.setCharacterEncoding("UTF-8");
+        response.setStatus(sc);
+        response.getWriter().write(msg);
+    }
 
     @GetMapping
     public List<OrderDto> getOrderList(
@@ -32,7 +39,12 @@ public class OrderController {
             return orderService.getOrderListByTableNumber(tableNumber).stream()
                     .map(order -> new OrderDto(order))
                     .collect(Collectors.toList());
+        } else if (tableNumber == null && status.equals(Order.STATUS_ALL)) {
+            return orderService.getOrderList().stream()
+                    .map(order -> new OrderDto(order))
+                    .collect(Collectors.toList());
         }
+
         return orderService.getOrderListByTableNumberAndStatus(tableNumber, status).stream()
                 .map(order -> new OrderDto(order))
                 .collect(Collectors.toList());
@@ -41,26 +53,32 @@ public class OrderController {
     @PostMapping
     public OrderDto createOrder(
             @RequestBody OrderCreateDto dto,
-            HttpServletResponse response) {
-        Optional<Order> order = orderService.createOrder(dto);
-        if (order.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            HttpServletResponse response) throws IOException {
+        try {
+            Optional<Order> order = orderService.createOrder(dto);
+            if (order.isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return null;
+            }
+            return new OrderDto(order.get());
+        } catch (IllegalStateException e) {
+            setResponse(response, HttpServletResponse.SC_BAD_REQUEST, "주문 실패 : 주문한 메뉴 중 주문 불가(수량 부족)한 메뉴 존재");
+            return null;
+        } catch (IllegalArgumentException e) {
+            setResponse(response, HttpServletResponse.SC_BAD_REQUEST, "주문 실패 : 주문 정보 없음");
             return null;
         }
-
-        return new OrderDto(order.get());
     }
 
     @DeleteMapping("/{orderId}")
     public void cancelOrder(
             @PathVariable Long orderId,
-            HttpServletResponse response
-    ) {
+            HttpServletResponse response) throws IOException {
         if (orderService.cancelOrder(orderId)) {
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             return;
         }
-        response.setStatus(HttpServletResponse.SC_CONFLICT);
+        setResponse(response, HttpServletResponse.SC_BAD_REQUEST, "취소 실패 : 주문 정보를 확인하세요");
         return;
     }
 
@@ -69,19 +87,19 @@ public class OrderController {
     public OrderDto updateOrderStatusWithPayment(
             @PathVariable Long orderId,
             HttpServletResponse response
-    ) {
+    ) throws IOException {
         try {
             Optional<Order> orderOptional = orderService.updateOrderStatusWithPayment(orderId);
 
             if (orderOptional.isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                setResponse(response, HttpServletResponse.SC_NOT_FOUND, "결제 완료 실패 : 없는 주문 id");
                 return null;
             }
 
             Order order = orderOptional.get();
             return new OrderDto(order);
         } catch (IllegalStateException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            setResponse(response, HttpServletResponse.SC_BAD_REQUEST, "결제 완료 실패 : 주문 상태를 확인하세요");
             return null;
         }
     }
@@ -90,19 +108,19 @@ public class OrderController {
     public OrderDto updateOrderStatusWithComplete(
             @PathVariable Long orderId,
             HttpServletResponse response
-    ) {
+    ) throws IOException {
         try {
             Optional<Order> orderOptional = orderService.updateOrderStatusWithComplete(orderId);
 
             if (orderOptional.isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                setResponse(response, HttpServletResponse.SC_NOT_FOUND, "서빙 완료 실패 : 없는 주문 id");
                 return null;
             }
 
             Order order = orderOptional.get();
             return new OrderDto(order);
         } catch (IllegalStateException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            setResponse(response, HttpServletResponse.SC_BAD_REQUEST, "서빙 완료 실패 : 주문 상태를 확인하세요");
             return null;
         }
     }

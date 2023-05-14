@@ -17,4 +17,4 @@ spring:
   jpa:
     database: h2
     hibernate:
-      ddl-auto: none
+      ddl-auto: create-drop

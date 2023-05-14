@@ -20,7 +20,7 @@ public class OrderDetail {
     private Integer quantity;
 
     @Column(name = "order_detail_menu_id")
-    private Integer menuId;
+    private Long menuId;
 
     @ManyToOne
     @JoinColumn(name = "order_id")

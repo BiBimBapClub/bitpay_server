@@ -2,18 +2,21 @@ package com.konkuk.bit.bitpay.order.service;
 
 import com.konkuk.bit.bitpay.menu.Menu;
 import com.konkuk.bit.bitpay.menu.service.MenuService;
-import com.konkuk.bit.bitpay.menu.web.Dto.MenuResponseDto;
 import com.konkuk.bit.bitpay.order.domain.Order;
 import com.konkuk.bit.bitpay.order.domain.OrderDetail;
 import com.konkuk.bit.bitpay.order.dto.OrderCreateDto;
 import com.konkuk.bit.bitpay.order.repository.OrderDetailRepository;
 import com.konkuk.bit.bitpay.order.repository.OrderRepository;
-import org.springframework.transaction.annotation.Transactional;
+import com.konkuk.bit.bitpay.tablehistory.service.TableHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +25,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final MenuService menuService;
+    private final TableHistoryService tableHistoryService;
     private final OrderDetailRepository orderDetailRepository;
 
     @Override
@@ -34,14 +38,22 @@ public class OrderServiceImpl implements OrderService {
                 .tableNumber(dto.getTableNumber())
                 .build();
 
-        Map<Integer, Integer> orderList = dto.getOrderDetail();
+        Map<Long, Integer> orderList = dto.getOrderDetail();
 
         List<OrderDetail> detailList = new ArrayList<>();
 
         int totalPrice = 0;
-        for (Integer menuId : orderList.keySet()) {
-            MenuResponseDto menu = menuService.getMenu(menuId);
+        if (orderList == null) {
+            throw new IllegalArgumentException("주문 정보가 없음");
+        }
+        for (Long menuId : orderList.keySet()) {
+            Menu menu = menuService.getMenuEntity(menuId);
             Integer quantity = orderList.get(menuId);
+
+            if (!menuService.updateMenuRemainStatus(menuId, quantity)) {
+                throw new IllegalArgumentException("수량 부족");
+            }
+
             OrderDetail orderDetail = OrderDetail.builder()
                     .menuId(menuId)
                     .order(order)
@@ -55,7 +67,9 @@ public class OrderServiceImpl implements OrderService {
         order.setDetailList(detailList);
         order.setTotalPrice(totalPrice);
 
-        return Optional.of(orderRepository.save(order));
+        Order saved = orderRepository.save(order);
+        tableHistoryService.createOrderHistory(saved);
+        return Optional.of(saved);
     }
 
     @Override
@@ -105,10 +119,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<Order> getOrderList() {
+        return orderRepository.findAll().stream()
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public List<Order> getOrderListByStatus(String status) {
         return orderRepository.findAllByStatus(status).stream()
-                .sorted(Comparator.comparing(Order::getTimestamp))
                 .collect(Collectors.toList());
     }
 
@@ -116,7 +135,6 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public List<Order> getOrderListByTableNumber(Integer tableNumber) {
         return orderRepository.findAllByTableNumber(tableNumber).stream()
-                .sorted(Comparator.comparing(Order::getTimestamp))
                 .collect(Collectors.toList());
     }
 
@@ -124,7 +142,6 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public List<Order> getOrderListByTableNumberAndStatus(Integer tableNumber, String status) {
         return orderRepository.findAllByTableNumberAndStatus(tableNumber, status).stream()
-                .sorted(Comparator.comparing(Order::getTimestamp))
                 .collect(Collectors.toList());
     }
 }

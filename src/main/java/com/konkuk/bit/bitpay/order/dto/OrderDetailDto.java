@@ -7,14 +7,11 @@ import lombok.Setter;
 
 @Getter @Setter @NoArgsConstructor
 public class OrderDetailDto {
-    private String menuName;
     private Long menuId;
     private Integer quantity;
 
     public OrderDetailDto(OrderDetail source) {
-        // TODO menu 에서 가져오기
-        this.menuName = "TODO:GET_MENU_NAME";
-        this.menuId = 0L;
+        this.menuId = source.getMenuId();
         this.quantity = source.getQuantity();
     }
 }

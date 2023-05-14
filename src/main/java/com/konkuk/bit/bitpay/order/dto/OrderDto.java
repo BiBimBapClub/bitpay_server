@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter @Setter @NoArgsConstructor
 public class OrderDto {
@@ -25,5 +26,8 @@ public class OrderDto {
         this.timestamp = source.getTimestamp();
         this.status = source.getStatus();
         this.tableNumber = source.getTableNumber();
+        this.detailList = source.getDetailList().stream()
+                .map(detail -> new OrderDetailDto(detail))
+                .collect(Collectors.toList());
     }
 }
