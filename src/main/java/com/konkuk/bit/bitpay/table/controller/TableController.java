@@ -1,5 +1,7 @@
-package com.konkuk.bit.bitpay.table;
+package com.konkuk.bit.bitpay.table.controller;
 
+import com.konkuk.bit.bitpay.table.dto.TableDto;
+import com.konkuk.bit.bitpay.table.service.TableServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,6 +1,7 @@
-package com.konkuk.bit.bitpay.table;
+package com.konkuk.bit.bitpay.table.service;
 
-import java.time.LocalDateTime;
+import com.konkuk.bit.bitpay.table.dto.TableDto;
+
 import java.util.List;
 
 public interface TableService {

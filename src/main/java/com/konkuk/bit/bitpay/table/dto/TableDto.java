@@ -1,4 +1,4 @@
-package com.konkuk.bit.bitpay.table;
+package com.konkuk.bit.bitpay.table.dto;
 
 import com.konkuk.bit.bitpay.order.dto.OrderDto;
 import lombok.AllArgsConstructor;

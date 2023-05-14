@@ -1,4 +1,4 @@
-package com.konkuk.bit.bitpay.table;
+package com.konkuk.bit.bitpay.table.domain;
 
 import jakarta.persistence.Column;
 import lombok.*;

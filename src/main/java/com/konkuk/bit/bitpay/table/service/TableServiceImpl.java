@@ -1,7 +1,12 @@
-package com.konkuk.bit.bitpay.table;
+package com.konkuk.bit.bitpay.table.service;
 
 import com.konkuk.bit.bitpay.order.dto.OrderDto;
+import com.konkuk.bit.bitpay.order.repository.OrderRepository;
 import com.konkuk.bit.bitpay.order.service.OrderService;
+import com.konkuk.bit.bitpay.table.repository.TableRedisRepository;
+import com.konkuk.bit.bitpay.table.domain.TableStatus;
+import com.konkuk.bit.bitpay.table.domain.Table;
+import com.konkuk.bit.bitpay.table.dto.TableDto;
 import com.konkuk.bit.bitpay.tablehistory.service.TableHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +27,7 @@ public class TableServiceImpl implements TableService{
 
     private final TableRedisRepository tableRepository;
     private final TableHistoryService tableHistoryService;
-    private final OrderService orderService;
+    private final OrderRepository orderRepository;
     private static final int MAX_TABLE_NUMBER = 35;
     private static final LocalTime INIT_TIME = LocalTime.of(2, 0);
 
@@ -138,7 +143,7 @@ public class TableServiceImpl implements TableService{
         tableDto.setStatus(table.getStatus());
         tableDto.setUpdatedTime(table.getUpdatedTime());
         Integer value = Integer.parseInt(tableDto.getNumber().substring("table:".length()));
-        List<OrderDto> orderDtoList = orderService.getOrderListByTableNumber(value).stream()
+        List<OrderDto> orderDtoList = orderRepository.findAllByTableNumber(value).stream()
                 .map(o -> new OrderDto(o))
                 .collect(Collectors.toList());
         tableDto.setOrders(orderDtoList);
