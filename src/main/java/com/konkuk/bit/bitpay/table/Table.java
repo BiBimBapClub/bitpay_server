@@ -18,7 +18,7 @@ import java.util.UUID;
 public class Table {
     @Id
     @Column(name = "table_number")
-    private Integer number;
+    private String number;
 
     @Column(name = "table_uuid")
     private UUID uuid;
