@@ -39,10 +39,10 @@ public class OrderServiceImpl implements OrderService {
         for (Long menuId : orderList.keySet()) {
             // TODO : MENU 받아오기
             // TODO : MENU getter 요청
-            Menu menu = Menu.builder().menuNumber(menuId).price(5000).build();
+            Menu menu = Menu.builder().number(  menuId).price(5000).build();
             Integer quantity = orderList.get(menuId);
             OrderDetail orderDetail = OrderDetail.builder()
-                    .menuId(menu.getMenuNumber())
+                    .menuId(menu.getNumber())
                     .order(order)
                     .quantity(quantity)
                     .build();
