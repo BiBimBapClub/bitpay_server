@@ -1,12 +1,14 @@
 package com.konkuk.bit.bitpay.table;
 
+import com.konkuk.bit.bitpay.table.domain.Table;
+import com.konkuk.bit.bitpay.table.domain.TableStatus;
+import com.konkuk.bit.bitpay.table.repository.TableRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 @Component

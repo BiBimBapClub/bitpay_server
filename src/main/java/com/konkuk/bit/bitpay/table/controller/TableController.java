@@ -1,5 +1,7 @@
-package com.konkuk.bit.bitpay.table;
+package com.konkuk.bit.bitpay.table.controller;
 
+import com.konkuk.bit.bitpay.table.dto.TableDto;
+import com.konkuk.bit.bitpay.table.service.TableServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +19,22 @@ public class TableController {
     public List<TableDto> getTableList() {
         return tableService.getTableList();
     }
+
+    @PostMapping("/confirm_cleaned/{tableNumber}")
+    public TableDto confirmCleaned(@PathVariable Integer tableNumber){
+        return tableService.confirmCleaned(tableNumber);
+    }
+
+    @PostMapping("/confirm_clean/{tableNumber}")
+    public TableDto confirmClean(@PathVariable Integer tableNumber){
+        return tableService.confirmClean(tableNumber);
+    }
+
+    @PostMapping("/confirm_active/{tableNumber}")
+    public TableDto confirmActive(@PathVariable Integer tableNumber){
+        return tableService.confirmActive(tableNumber);
+    }
+
 
     @GetMapping("/{tableNumber}")
     public TableDto getTable(@PathVariable Integer tableNumber) {
