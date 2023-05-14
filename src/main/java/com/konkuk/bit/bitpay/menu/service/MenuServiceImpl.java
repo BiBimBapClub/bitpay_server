@@ -12,12 +12,8 @@ import java.util.List;
 public class MenuServiceImpl implements MenuService {
 
     @Override
-    public boolean createMenu(Integer menuNumber) {
-        return false;
-    }
-
-    @Override
     public MenuResponseDto getMenu(Integer menuNumber) {
+        
         return null;
     }
 

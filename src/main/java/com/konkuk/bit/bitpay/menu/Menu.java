@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 @Builder
@@ -23,7 +24,7 @@ public class Menu {
     @Column(name = "menu_remain")
     private Integer remain;
     @Column(name = "menu_status")
-    private String status;
+    private boolean status;
 
 
 }
