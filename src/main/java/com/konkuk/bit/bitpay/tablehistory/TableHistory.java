@@ -1,4 +1,4 @@
-package com.konkuk.bit.bitpay.table;
+package com.konkuk.bit.bitpay.tablehistory;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,7 +17,7 @@ public class TableHistory {
     @Column(name = "table_history_id")
     private Long id;
 
-    @Column(name = "table_number")
+    @Column(name = "table_number", unique = true)
     private Integer tableNumber;
 
     @Column(name = "table_history_timestamp")
