@@ -1,5 +1,6 @@
 package com.konkuk.bit.bitpay.table.service;
 
+import com.konkuk.bit.bitpay.order.domain.Order;
 import com.konkuk.bit.bitpay.order.dto.OrderDto;
 import com.konkuk.bit.bitpay.order.repository.OrderRepository;
 import com.konkuk.bit.bitpay.table.repository.TableRedisRepository;
@@ -155,7 +156,14 @@ public class TableServiceImpl implements TableService{
     public Boolean isFirstOrder(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
         Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
-        return table.getOrders().size() == 0;
+        return table.getOrders().stream()
+                .filter(id -> {
+                    Order order = orderRepository.findById(id).get();
+                    return order.getStatus().equals(Order.STATUS_PREPARING) ||
+                            order.getStatus().equals(Order.STATUS_COMPLETE);
+                })
+                .collect(Collectors.toList())
+                .size() == 0;
     }
 
     @Override

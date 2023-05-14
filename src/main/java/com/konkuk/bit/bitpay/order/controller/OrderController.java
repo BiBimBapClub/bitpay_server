@@ -65,7 +65,7 @@ public class OrderController {
             setResponse(response, HttpServletResponse.SC_BAD_REQUEST, "주문 실패 : 주문한 메뉴 중 주문 불가(수량 부족)한 메뉴 존재");
             return null;
         } catch (IllegalArgumentException e) {
-            setResponse(response, HttpServletResponse.SC_BAD_REQUEST, "주문 실패 : 주문 정보 없음");
+            setResponse(response, HttpServletResponse.SC_BAD_REQUEST, "주문 실패 : " + e.getMessage());
             return null;
         }
     }

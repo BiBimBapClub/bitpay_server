@@ -8,6 +8,8 @@ import com.konkuk.bit.bitpay.order.dto.OrderCreateDto;
 import com.konkuk.bit.bitpay.order.dto.OrderDetailCreateDto;
 import com.konkuk.bit.bitpay.order.repository.OrderDetailRepository;
 import com.konkuk.bit.bitpay.order.repository.OrderRepository;
+import com.konkuk.bit.bitpay.table.domain.TableStatus;
+import com.konkuk.bit.bitpay.table.dto.TableDto;
 import com.konkuk.bit.bitpay.table.service.TableService;
 import com.konkuk.bit.bitpay.tablehistory.service.TableHistoryService;
 import lombok.RequiredArgsConstructor;
@@ -73,6 +75,10 @@ public class OrderServiceImpl implements OrderService {
             Integer quantity = cdto.getCount();
             Menu menu = menuService.getMenuEntity(menuId);
 
+            if (!menu.isStatus()) {
+                throw new IllegalArgumentException("주문 불가한 메뉴 포함");
+            }
+
             for (int mId : removeArr[Math.toIntExact(menuId)]) {
                 if (!menuService.updateMenuRemainStatus(Long.valueOf(mId), quantity)) {
                     throw new IllegalStateException("수량 부족");
@@ -89,13 +95,19 @@ public class OrderServiceImpl implements OrderService {
             totalPrice += quantity * menu.getPrice();
         }
 
+        if (totalPrice < 14000) {
+            throw new IllegalArgumentException("최소 금액 부족");
+        }
+
         order.setDetailList(detailList);
         order.setTotalPrice(totalPrice);
 
         Order saved = orderRepository.save(order);
         tableHistoryService.createOrderHistory(saved);
         tableService.createOrderToTable(dto.getTableNumber(), saved.getId());
-
+        if (tableService.isFirstOrder(dto.getTableNumber())) {
+            tableService.updateTableStatus(dto.getTableNumber(), TableStatus.ACTIVE.name());
+        }
         return Optional.of(saved);
     }
 
@@ -129,11 +141,13 @@ public class OrderServiceImpl implements OrderService {
         };
         int flag = 0;
 
-        order.setStatus(Order.STATUS_PREPARING);
-
-        for (OrderDetail orderDetail : order.getDetailList()) {
-            flag = (int) Math.max(flag, timeArr[Math.toIntExact(orderDetail.getMenuId())]);
+        if (!tableService.isFirstOrder(order.getTableNumber())) {
+            for (OrderDetail orderDetail : order.getDetailList()) {
+                flag = Math.max(flag, timeArr[Math.toIntExact(orderDetail.getMenuId())]);
+            }
         }
+
+        order.setStatus(Order.STATUS_PREPARING);
         switch (flag) {
             case 1:
                 tableService.updateTableTime(order.getTableNumber(), LocalTime.of(0, 30));
