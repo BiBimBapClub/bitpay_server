@@ -26,5 +26,9 @@ public class Menu {
     @Column(name = "menu_status")
     private boolean status;
 
-
+    public void update(Integer orderCount, boolean status)
+    {
+        this.remain -= orderCount;
+        this.status = status;
+    }
 }

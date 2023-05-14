@@ -32,7 +32,18 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public boolean updateMenuRemainStatus(Long menuNumber, Integer orderCount) {
         Menu menu = getMenuEntity(menuNumber);
-        return false;
+        final boolean orderOK = true;
+        final boolean orderNotOK = false;
+        int remainCount = menu.getRemain() - orderCount;
+
+        if(remainCount > 0) //잔여량이 주문 개수 보다 클 때
+            menu.update(orderCount,orderOK);
+        else if(remainCount == 0) //잔여량이 주문 개수 보다 클 때
+            menu.update(orderCount,orderNotOK);
+        else
+            return false;
+        
+        return true;
     }
 
     @Override
