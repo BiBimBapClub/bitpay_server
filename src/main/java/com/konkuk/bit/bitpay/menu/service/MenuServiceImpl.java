@@ -23,6 +23,8 @@ public class MenuServiceImpl implements MenuService {
     public MenuResponseDto getMenu(Long menuNumber) {
         Menu menu = getMenuEntity(menuNumber);
         return MenuResponseDto.builder()
+                .number(menuNumber)
+                .name(menu.getName())
                 .remain(menu.getRemain())
                 .status(menu.isStatus())
                 .build();
@@ -51,6 +53,8 @@ public class MenuServiceImpl implements MenuService {
         List<MenuResponseDto> responseList = new ArrayList<>();
         for(Menu menu : menuList) {
             MenuResponseDto dto = MenuResponseDto.builder()
+                    .number(menu.getNumber())
+                    .name(menu.getName())
                     .remain(menu.getRemain())
                     .status(menu.isStatus())
                     .build();

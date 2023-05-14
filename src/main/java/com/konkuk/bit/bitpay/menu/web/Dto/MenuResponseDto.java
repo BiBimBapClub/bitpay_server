@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MenuResponseDto {
+    private Long number;
+    private String name;
     private Integer remain;
     private Boolean status;
 }
