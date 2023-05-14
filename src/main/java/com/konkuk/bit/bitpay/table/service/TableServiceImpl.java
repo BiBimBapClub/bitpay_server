@@ -150,7 +150,7 @@ public class TableServiceImpl implements TableService{
         List<TableDto> tableList = new ArrayList<>();
         for (int tableNumber = 1; tableNumber <= MAX_TABLE_NUMBER; tableNumber++) {
             String key = generateRedisKey(tableNumber);
-            Optional<Table> optionalTable = tableRepository.findById(String.valueOf(tableNumber));
+            Optional<Table> optionalTable = tableRepository.findById(key);
             optionalTable.ifPresent(table -> tableList.add(convertToTableDto(table)));
         }
         return tableList;
