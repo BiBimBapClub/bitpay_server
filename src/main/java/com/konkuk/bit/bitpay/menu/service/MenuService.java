@@ -9,7 +9,7 @@ public interface MenuService {
 
     MenuResponseDto getMenu(Long menuNumber);
 
-    boolean updateMenuRemainStatus(Long menuNumber, MenuUpdateDto menuUpdateDto);
+    boolean updateMenuRemainStatus(Long menuNumber, Integer orderCount);
 
     List<MenuResponseDto> getMenuList();
 

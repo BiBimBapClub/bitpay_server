@@ -26,9 +26,9 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public boolean updateMenuRemainStatus(Long menuNumber, MenuUpdateDto menuUpdateDto) {
+    public boolean updateMenuRemainStatus(Long menuNumber, Integer orderCount) {
         Menu menu = menuRedisRepository.findById(menuNumber).orElseThrow(IllegalAccessError::new);
-
+        
         return false;
     }
 
