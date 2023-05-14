@@ -93,7 +93,7 @@ public class TableServiceImpl implements TableService{
     @Transactional
     public TableDto updateTableTime(Integer tableNumber, LocalTime interval) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findByNumber(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
 
         LocalDateTime updatedTime = table.getUpdatedTime();
         LocalDateTime newTime = updatedTime.plusHours(interval.getHour())
