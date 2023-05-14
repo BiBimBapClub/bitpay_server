@@ -38,7 +38,7 @@ jobs:
           host: ${{ secrets.BACK_HOST }}
           username: ${{ secrets.USER }}
           script: |
-            cd bitpay-server
+            cd bitpay_server
             git reset --hard
             git fetch
             git pull
@@ -49,7 +49,7 @@ jobs:
           host: ${{ secrets.BACK_HOST }}
           username: ${{ secrets.USER }}
           script: |
-            cd bitpay-server
+            cd bitpay_server
             chmod +x gradlew
             ./gradlew build -x check
             nohup java -jar complete-v1.0.0.jar & 
