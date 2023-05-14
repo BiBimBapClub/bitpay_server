@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface TableRedisRepository extends CrudRepository<Table, Integer> {
-    Optional<Table> findByNumber(Integer tableNumber);
+public interface TableRedisRepository extends CrudRepository<Table, String> {
+    Optional<Table> findByNumber(String tableNumber);
 
 }
