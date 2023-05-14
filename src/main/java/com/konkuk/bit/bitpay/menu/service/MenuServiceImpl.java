@@ -5,6 +5,7 @@ import com.konkuk.bit.bitpay.menu.domain.MenuRedisRepository;
 import com.konkuk.bit.bitpay.menu.web.Dto.MenuResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @Transactional
     public boolean updateMenuRemainStatus(Long menuNumber, Integer orderCount) {
         Menu menu = getMenuEntity(menuNumber);
         final boolean orderOK = true;
