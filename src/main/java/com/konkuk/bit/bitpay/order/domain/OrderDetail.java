@@ -1,13 +1,13 @@
-package com.konkuk.bit.bitpay.order;
+package com.konkuk.bit.bitpay.order.domain;
 
 import com.konkuk.bit.bitpay.menu.Menu;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@Builder
+@Builder @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDetail {
@@ -25,5 +25,7 @@ public class OrderDetail {
 
     @ManyToOne
     @JoinColumn(name = "order_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Order order;
+
 }
