@@ -1,16 +1,13 @@
-package com.konkuk.bit.bitpay.order;
+package com.konkuk.bit.bitpay.order.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Entity
-@Builder
+@Builder @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Order {
