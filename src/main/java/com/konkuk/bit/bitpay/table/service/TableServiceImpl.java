@@ -235,6 +235,18 @@ public class TableServiceImpl implements TableService{
         return tableDto;
     }
 
+    @Override
+    @Transactional
+    public TableDto setNowUpdateTableTime(Integer tableNumber) {
+        String key = generateRedisKey(tableNumber);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        table.setUpdatedTime(LocalDateTime.now());
+        tableRepository.save(table);
+        TableDto tableDto = convertToTableDto(table);
+        tableHistoryService.createTableHistory(tableDto, "TIME");
+        return tableDto;
+    }
+
     // 완전 초기값 설정해줘야함.
     private void resetTable(Table table) {
         table.setUpdatedTime(null);
