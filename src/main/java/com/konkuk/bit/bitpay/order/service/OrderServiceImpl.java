@@ -95,7 +95,7 @@ public class OrderServiceImpl implements OrderService {
             totalPrice += quantity * menu.getPrice();
         }
 
-        if (totalPrice < 14000) {
+        if (tableService.isFirstOrder(tableNumber) && totalPrice < 14000) {
             throw new IllegalArgumentException("최소 금액 부족");
         }
 
@@ -148,7 +148,7 @@ public class OrderServiceImpl implements OrderService {
         for (OrderDetail orderDetail : order.getDetailList()) {
             if (!tableService.isFirstOrder(order.getTableNumber()))
                 flag = Math.max(flag, timeArr[Math.toIntExact(orderDetail.getMenuId())]);
-            if(!menuService.updateMenuRemainStatus(orderDetail.getMenuId(),orderDetail.getQuantity()))
+            if (!menuService.updateMenuRemainStatus(orderDetail.getMenuId(), orderDetail.getQuantity()))
                 throw new IllegalStateException("주문 물품 수량 부족");
         }
 
