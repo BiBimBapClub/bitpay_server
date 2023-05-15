@@ -188,9 +188,9 @@ public class TableServiceImpl implements TableService{
         tableDto.setStatus(table.getStatus());
         tableDto.setUpdatedTime(table.getUpdatedTime());
         Integer value = Integer.parseInt(tableDto.getNumber().substring("table:".length()));
-        List<OrderDto> orderDtoList = orderRepository.findAllByTableNumber(value).stream()
-                .map(o -> new OrderDto(o))
-                .collect(Collectors.toList());
+        List<OrderDto> orderDtoList = table.getOrders().stream()
+                .map(orderId -> new OrderDto(orderRepository.findById(orderId).get()))
+                .toList();
         tableDto.setOrders(orderDtoList);
         return tableDto;
     }
