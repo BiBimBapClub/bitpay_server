@@ -204,6 +204,7 @@ public class TableServiceImpl implements TableService{
         if(!table.getStatus().contentEquals(TableStatus.CLEAN_REQUEST.getStatus())) throw new IllegalStateException();
 
         table.setStatus(TableStatus.CLEAN.getStatus());
+        table.setOrders(new ArrayList<>());
         table.setUuid(UUID.randomUUID());
         tableRepository.save(table);
         TableDto tableDto = convertToTableDto(table);
@@ -240,6 +241,28 @@ public class TableServiceImpl implements TableService{
         TableDto tableDto = convertToTableDto(table);
         tableHistoryService.createTableHistory(tableDto, "ALL");
         return tableDto;
+    }
+
+    @Override
+    @Transactional
+    public TableDto setNowUpdateTableTime(Integer tableNumber) {
+        String key = generateRedisKey(tableNumber);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        table.setUpdatedTime(LocalDateTime.now());
+        tableRepository.save(table);
+        TableDto tableDto = convertToTableDto(table);
+        tableHistoryService.createTableHistory(tableDto, "TIME");
+        return tableDto;
+    }
+
+    @Override
+    public Boolean getTableStatusActive(Integer tableNumber) {
+        String key = generateRedisKey(tableNumber);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        if (!table.getStatus().contentEquals(TableStatus.ACTIVE.getStatus())) {
+            return false;
+        }
+        return true;
     }
 
     // 완전 초기값 설정해줘야함.
