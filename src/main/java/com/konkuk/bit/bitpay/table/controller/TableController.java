@@ -3,6 +3,8 @@ package com.konkuk.bit.bitpay.table.controller;
 import com.konkuk.bit.bitpay.table.dto.TableDto;
 import com.konkuk.bit.bitpay.table.service.TableServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -51,7 +53,35 @@ public class TableController {
         return tableService.updateTableStatus(tableNumber, status);
     }
 
-//    테이블 상태변경 {"청소완료"),("청소요청"),("사용중")}
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException e) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    public class ErrorResponse {
+        private HttpStatus status;
+        private String message;
+
+        public ErrorResponse(HttpStatus status, String message) {
+            this.status = status;
+            this.message = message;
+        }
+
+        public HttpStatus getStatus() {
+            return status;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+    }
 }
 
 //    @PostMapping("/{tableNumber}/move")

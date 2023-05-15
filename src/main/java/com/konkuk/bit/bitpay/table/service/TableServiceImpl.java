@@ -44,7 +44,8 @@ public class TableServiceImpl implements TableService{
         if (tableOptional.isPresent()) {
             Table table = tableOptional.get();
             // 테이블이 청소완료가 아니면 에외
-            if(!table.getStatus().contentEquals(TableStatus.CLEAN.getStatus())) throw new IllegalStateException();
+            if(!table.getStatus().contentEquals(TableStatus.CLEAN.getStatus()))
+                throw new IllegalStateException("테이블이 청소 완료 상태가 아닙니다");
 
             //사용중
             table.setStatus(TableStatus.ACTIVE.getStatus());
@@ -67,7 +68,7 @@ public class TableServiceImpl implements TableService{
     @Override
     public TableDto getTable(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(()->new IllegalArgumentException("테이블 Key가 올바르지 않습니다."));
 
         return convertToTableDto(table);
     }
@@ -78,7 +79,7 @@ public class TableServiceImpl implements TableService{
     @Transactional
     public TableDto updateTableStatus(Integer tableNumber, String newStatus) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(()->new IllegalArgumentException("테이블 Key가 올바르지 않습니다."));
 
         if (isValidTableStatus(newStatus)) {
             TableStatus status = TableStatus.valueOf(newStatus);
@@ -94,7 +95,7 @@ public class TableServiceImpl implements TableService{
     @Transactional
     public TableDto updateTableTime(Integer tableNumber, LocalTime interval) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(()->new IllegalArgumentException("테이블 Key가 올바르지 않습니다."));
 
         LocalDateTime updatedTime = table.getUpdatedTime();
         LocalDateTime newTime = updatedTime.plusHours(interval.getHour())
@@ -107,28 +108,12 @@ public class TableServiceImpl implements TableService{
         return tableDto;
     }
 
-    // 테이블 옮기기
-//    @Transactional
-//    public TableDto moveTable(Integer tableNumber, Integer newTableNumber) {
-//        String sourceKey = generateRedisKey(tableNumber);
-//        String destinationKey = generateRedisKey(newTableNumber);
-//        Table table = redisTemplate.opsForValue().get(sourceKey);
-//        if (table != null) {
-//            redisTemplate.opsForValue().set(destinationKey, table);
-//            TableDto tableDto = convertToTableDto(table);
-//            resetTable(table);
-//            return tableDto;
-//        }
-//        //예외 처리 해야함.
-//        return null;
-//    }
-
 
     @Override
     @Transactional
     public Boolean createOrderToTable(Integer tableNumber, Long orderId) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(()->new IllegalArgumentException("테이블 Key가 올바르지 않습니다."));
         if (table.getOrders().contains(orderId)) {
             return false;
         }
@@ -141,7 +126,7 @@ public class TableServiceImpl implements TableService{
     @Transactional
     public Boolean deleteOrderToTable(Integer tableNumber, Long orderId) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(()->new IllegalArgumentException("테이블 Key가 올바르지 않습니다."));
         if(table.getOrders().contains(orderId)) {
             table.getOrders().remove(orderId);
             tableRepository.save(table);
@@ -155,7 +140,7 @@ public class TableServiceImpl implements TableService{
     @Override
     public Boolean isFirstOrder(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(()->new IllegalArgumentException("테이블 Key가 올바르지 않습니다."));
         return table.getOrders().stream()
                 .filter(id -> {
                     Order order = orderRepository.findById(id).get();
@@ -199,9 +184,10 @@ public class TableServiceImpl implements TableService{
     @Transactional
     public TableDto confirmCleaned(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(()->new IllegalArgumentException("테이블 Key가 올바르지 않습니다."));
 
-        if(!table.getStatus().contentEquals(TableStatus.CLEAN_REQUEST.getStatus())) throw new IllegalStateException();
+        if(!table.getStatus().contentEquals(TableStatus.CLEAN_REQUEST.getStatus()))
+            throw new IllegalStateException("테이블이 청소 요청 상태가 아닙니다");
 
         table.setStatus(TableStatus.CLEAN.getStatus());
         table.getOrders().clear();
@@ -216,9 +202,10 @@ public class TableServiceImpl implements TableService{
     @Transactional
     public TableDto confirmClean(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(()->new IllegalArgumentException("테이블 Key가 올바르지 않습니다."));
 
-        if(!table.getStatus().contentEquals(TableStatus.ACTIVE.getStatus())) throw new IllegalStateException();
+        if(!table.getStatus().contentEquals(TableStatus.ACTIVE.getStatus()))
+            throw new IllegalStateException("테이블이 활성 상태가 아닙니다");
 
         table.setStatus(TableStatus.CLEAN_REQUEST.getStatus());
         tableRepository.save(table);
@@ -231,9 +218,10 @@ public class TableServiceImpl implements TableService{
     @Transactional
     public TableDto confirmActive(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(()->new IllegalArgumentException("테이블 Key가 올바르지 않습니다."));
 
-        if(!table.getStatus().contentEquals(TableStatus.CLEAN.getStatus())) throw new IllegalStateException();
+        if(!table.getStatus().contentEquals(TableStatus.CLEAN.getStatus()))
+            throw new IllegalStateException("테이블이 청소 완료 상태가 아닙니다");
 
         table.setStatus(TableStatus.ACTIVE.getStatus());
         table.setUpdatedTime(LocalDateTime.now());
@@ -247,7 +235,7 @@ public class TableServiceImpl implements TableService{
     @Transactional
     public TableDto setNowUpdateTableTime(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(()->new IllegalArgumentException("테이블 Key가 올바르지 않습니다."));
         table.setUpdatedTime(LocalDateTime.now());
         tableRepository.save(table);
         TableDto tableDto = convertToTableDto(table);
@@ -258,18 +246,11 @@ public class TableServiceImpl implements TableService{
     @Override
     public Boolean getTableStatusActive(Integer tableNumber) {
         String key = generateRedisKey(tableNumber);
-        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        Table table = tableRepository.findById(key).orElseThrow(()->new IllegalArgumentException("테이블 Key가 올바르지 않습니다."));
         if (!table.getStatus().contentEquals(TableStatus.ACTIVE.getStatus())) {
             return false;
         }
         return true;
-    }
-
-    // 완전 초기값 설정해줘야함.
-    private void resetTable(Table table) {
-        table.setUpdatedTime(null);
-        table.setUuid(null);
-        table.setStatus(TableStatus.CLEAN.getStatus());
     }
 
     private boolean isValidTableStatus(String status) {
