@@ -196,6 +196,7 @@ public class TableServiceImpl implements TableService{
         if(!table.getStatus().contentEquals(TableStatus.CLEAN_REQUEST.getStatus())) throw new IllegalStateException();
 
         table.setStatus(TableStatus.CLEAN.getStatus());
+        table.setOrders(new ArrayList<>());
         table.setUuid(UUID.randomUUID());
         tableRepository.save(table);
         TableDto tableDto = convertToTableDto(table);
