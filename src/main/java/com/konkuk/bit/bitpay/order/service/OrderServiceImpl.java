@@ -76,12 +76,12 @@ public class OrderServiceImpl implements OrderService {
             Menu menu = menuService.getMenuEntity(menuId);
 
             if (!menu.isStatus()) {
-                throw new IllegalArgumentException("Contain Invalid Menu");
+                throw new IllegalArgumentException("주문 불가능한 메뉴가 존재합니다.");
             }
 
             for (int mId : removeArr[Math.toIntExact(menuId)]) {
                 if (!menuService.isPossibleOrderQuantity(Long.valueOf(mId), quantity)) {
-                    throw new IllegalStateException("Contain Invalid Menu");
+                    throw new IllegalStateException("주문 불가능한 메뉴가 존재합니다.");
                 }
             }
 
@@ -96,7 +96,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         if (tableService.isFirstOrder(tableNumber) && totalPrice < 14000) {
-            throw new IllegalArgumentException("First Order Must be up to 14000won");
+            throw new IllegalArgumentException("첫 주문은 14000원 이상이어야 합니다");
         }
 
         order.setDetailList(detailList);
