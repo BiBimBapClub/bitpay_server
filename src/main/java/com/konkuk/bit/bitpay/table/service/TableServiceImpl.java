@@ -247,6 +247,16 @@ public class TableServiceImpl implements TableService{
         return tableDto;
     }
 
+    @Override
+    public Boolean getTableStatusActive(Integer tableNumber) {
+        String key = generateRedisKey(tableNumber);
+        Table table = tableRepository.findById(key).orElseThrow(IllegalAccessError::new);
+        if (!table.getStatus().contentEquals(TableStatus.ACTIVE.getStatus())) {
+            return false;
+        }
+        return true;
+    }
+
     // 완전 초기값 설정해줘야함.
     private void resetTable(Table table) {
         table.setUpdatedTime(null);

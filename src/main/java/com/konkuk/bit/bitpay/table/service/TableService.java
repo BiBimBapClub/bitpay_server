@@ -15,6 +15,8 @@ public interface TableService {
 
     TableDto updateTableTime(Integer tableNumber, LocalTime interval);
 
+    Boolean getTableStatusActive(Integer tableNumber);
+
     TableDto setNowUpdateTableTime(Integer tableNumber);
 
 //    TableDto moveTable(Integer tableNumber, Integer newTableNumber);
