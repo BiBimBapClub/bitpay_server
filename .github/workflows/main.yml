@@ -53,7 +53,7 @@ jobs:
             dpkg -S /usr/bin/nohup
             chmod +x gradlew
             ./gradlew build -x check
-            sudo nohup java -jar /build/libs/bitpay-0.0.0.jar &
+            sudo nohup java -jar build/libs/bitpay-0.0.0.jar &
       - name: git back2 cloning...
         uses: appleboy/ssh-action@master
         with:
@@ -76,4 +76,4 @@ jobs:
             dpkg -S /usr/bin/nohup
             chmod +x gradlew
             ./gradlew build -x check
-            sudo nohup java -jar /build/libs/bitpay-0.0.0.jar &
+            sudo nohup java -jar build/libs/bitpay-0.0.0.jar &
