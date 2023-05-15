@@ -116,6 +116,13 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @Transactional
+    public boolean isPossibleOrderQuantity(Long menuNumber, Integer orderCount) {
+        Menu menu = getMenuEntity(menuNumber);
+        return menu.getRemain() - orderCount >= 0;
+    }
+
+    @Override
     public List<MenuResponseDto> getMenuList() {
         List<Menu> menuList = (List<Menu>) menuRedisRepository.findAll();
         List<MenuResponseDto> responseList = new ArrayList<>();

@@ -13,6 +13,8 @@ public interface MenuService {
 
     boolean updateMenuRemainStatus(Long menuNumber, Integer orderCount);
 
+    boolean isPossibleOrderQuantity(Long menuNumber, Integer orderCount);
+
     boolean updateStatusMenuFalse(Long menuNumber);
 
     List<MenuResponseDto> getMenuList();

@@ -99,7 +99,7 @@ public class OrderController {
             Order order = orderOptional.get();
             return new OrderDto(order);
         } catch (IllegalStateException e) {
-            setResponse(response, HttpServletResponse.SC_BAD_REQUEST, "결제 완료 실패 : 주문 상태를 확인하세요");
+            setResponse(response, HttpServletResponse.SC_BAD_REQUEST, "결제 완료 실패 : " + e.getMessage());
             return null;
         }
     }

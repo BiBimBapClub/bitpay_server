@@ -9,7 +9,6 @@ import com.konkuk.bit.bitpay.order.dto.OrderDetailCreateDto;
 import com.konkuk.bit.bitpay.order.repository.OrderDetailRepository;
 import com.konkuk.bit.bitpay.order.repository.OrderRepository;
 import com.konkuk.bit.bitpay.table.domain.TableStatus;
-import com.konkuk.bit.bitpay.table.dto.TableDto;
 import com.konkuk.bit.bitpay.table.service.TableService;
 import com.konkuk.bit.bitpay.tablehistory.service.TableHistoryService;
 import lombok.RequiredArgsConstructor;
@@ -37,10 +36,11 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public Optional<Order> createOrder(OrderCreateDto dto) {
 
+        Integer tableNumber = dto.getTableNumber();
         Order order = Order.builder()
                 .status(Order.STATUS_BEFORE_PAYMENT)
                 .timestamp(LocalDateTime.now())
-                .tableNumber(dto.getTableNumber())
+                .tableNumber(tableNumber)
                 .build();
 
         List<OrderDetailCreateDto> orderDetailList = dto.getOrderDetail();
@@ -80,7 +80,7 @@ public class OrderServiceImpl implements OrderService {
             }
 
             for (int mId : removeArr[Math.toIntExact(menuId)]) {
-                if (!menuService.updateMenuRemainStatus(Long.valueOf(mId), quantity)) {
+                if (!menuService.isPossibleOrderQuantity(Long.valueOf(mId), quantity)) {
                     throw new IllegalStateException("수량 부족");
                 }
             }
@@ -104,9 +104,12 @@ public class OrderServiceImpl implements OrderService {
 
         Order saved = orderRepository.save(order);
         tableHistoryService.createOrderHistory(saved);
-        tableService.createOrderToTable(dto.getTableNumber(), saved.getId());
-        if (tableService.isFirstOrder(dto.getTableNumber())) {
-            tableService.updateTableStatus(dto.getTableNumber(), TableStatus.ACTIVE.name());
+        tableService.createOrderToTable(tableNumber, saved.getId());
+        if (tableService.isFirstOrder(tableNumber)) {
+            if (!tableService.getTableStatusActive(tableNumber)) {
+                tableService.updateTableStatus(tableNumber, TableStatus.ACTIVE.name());
+                tableService.setNowUpdateTableTime(tableNumber);
+            }
         }
         return Optional.of(saved);
     }
@@ -121,7 +124,7 @@ public class OrderServiceImpl implements OrderService {
         // 2. 오더의 상태가 BEFORE_PAYMENT 가 아닐 때
         Order order = optionalOrder.get();
         if (!order.getStatus().equals(Order.STATUS_BEFORE_PAYMENT))
-            throw new IllegalStateException("Invalid Request");
+            throw new IllegalStateException("올바르지 않은 주문 상태입니다");
 
         int[] timeArr = {
                 0,
@@ -141,10 +144,12 @@ public class OrderServiceImpl implements OrderService {
         };
         int flag = 0;
 
-        if (!tableService.isFirstOrder(order.getTableNumber())) {
-            for (OrderDetail orderDetail : order.getDetailList()) {
+
+        for (OrderDetail orderDetail : order.getDetailList()) {
+            if (!tableService.isFirstOrder(order.getTableNumber()))
                 flag = Math.max(flag, timeArr[Math.toIntExact(orderDetail.getMenuId())]);
-            }
+            if(!menuService.updateMenuRemainStatus(orderDetail.getMenuId(),orderDetail.getQuantity()))
+                throw new IllegalStateException("주문 물품 수량 부족");
         }
 
         order.setStatus(Order.STATUS_PREPARING);
