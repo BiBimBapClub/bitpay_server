@@ -34,7 +34,7 @@ public class TableInitializer implements CommandLineRunner {
             String key = generateRedisKey(tableNumber);
             Table table = Table.builder()
                     .number(key)
-                    .uuid(UUID.randomUUID())
+                    .uuid(UUID.randomUUID().toString())
                     .status(TableStatus.CLEAN.getStatus())
                     .updatedTime(LocalDateTime.now())
                     .build();
@@ -51,7 +51,7 @@ public class TableInitializer implements CommandLineRunner {
     private TableDto convertToTableDto(Table table) {
         TableDto tableDto = new TableDto();
         tableDto.setNumber(table.getNumber());
-        tableDto.setUuid(table.getUuid());
+        tableDto.setUuid(table.getUuid().toString());
         tableDto.setStatus(table.getStatus());
         tableDto.setUpdatedTime(table.getUpdatedTime());
         Integer value = Integer.parseInt(tableDto.getNumber().substring("table:".length()));

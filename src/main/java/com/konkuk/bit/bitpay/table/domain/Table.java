@@ -23,7 +23,7 @@ public class Table {
     private String number;
 
     @Column(name = "table_uuid")
-    private UUID uuid;
+    private String uuid;
     @Column(name = "table_status")
     private String status;
     @Column(name = "table_order_id")

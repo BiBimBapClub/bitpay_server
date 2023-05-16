@@ -49,7 +49,7 @@ public class TableServiceImpl implements TableService{
 
             //사용중
             table.setStatus(TableStatus.ACTIVE.getStatus());
-            table.setUuid(UUID.randomUUID());
+            table.setUuid(UUID.randomUUID().toString());
             tableRepository.save(table);
             tableDto = convertToTableDto(table);
         } else {
@@ -57,7 +57,7 @@ public class TableServiceImpl implements TableService{
             Table table = new Table();
             table.setNumber(key);
             table.setStatus(TableStatus.ACTIVE.getStatus());
-            table.setUuid(UUID.randomUUID());
+            table.setUuid(UUID.randomUUID().toString());
             tableRepository.save(table);
             tableDto = convertToTableDto(table);
         }
@@ -191,7 +191,7 @@ public class TableServiceImpl implements TableService{
 
         table.setStatus(TableStatus.CLEAN.getStatus());
         table.getOrders().clear();
-        table.setUuid(UUID.randomUUID());
+        table.setUuid(UUID.randomUUID().toString());
         tableRepository.save(table);
         TableDto tableDto = convertToTableDto(table);
         tableHistoryService.createTableHistory(tableDto, "STATUS");

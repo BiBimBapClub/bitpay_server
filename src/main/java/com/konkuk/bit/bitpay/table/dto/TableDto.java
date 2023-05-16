@@ -16,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class TableDto {
     private String number;
-    private UUID uuid;
+    private String uuid;
     private String status;
     private String description;
     private LocalDateTime updatedTime;
