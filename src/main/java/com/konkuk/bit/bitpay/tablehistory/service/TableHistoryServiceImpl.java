@@ -3,7 +3,9 @@ package com.konkuk.bit.bitpay.tablehistory.service;
 import com.konkuk.bit.bitpay.menu.service.MenuService;
 import com.konkuk.bit.bitpay.order.domain.Order;
 import com.konkuk.bit.bitpay.order.domain.OrderDetail;
+import com.konkuk.bit.bitpay.table.domain.Table;
 import com.konkuk.bit.bitpay.table.dto.TableDto;
+import com.konkuk.bit.bitpay.table.repository.TableRedisRepository;
 import com.konkuk.bit.bitpay.tablehistory.domain.TableHistory;
 import com.konkuk.bit.bitpay.tablehistory.dto.TableHistoryDto;
 import com.konkuk.bit.bitpay.tablehistory.repository.TableHistoryRepository;
@@ -20,6 +22,7 @@ import java.util.Optional;
 public class TableHistoryServiceImpl implements TableHistoryService {
 
     private final TableHistoryRepository tableHistoryRepository;
+    private final TableRedisRepository tableRedisRepository;
     private final MenuService menuService;
 
     //Order가 들어왔을 때 해당 Order를 TableHistory에 반영
@@ -42,10 +45,13 @@ public class TableHistoryServiceImpl implements TableHistoryService {
         }
         description.append("총 주문금액: ").append(order.getTotalPrice()).append("\n");
 
+        Table table = tableRedisRepository.findById(generateRedisKey(tableNumber)).orElseThrow(() -> new IllegalArgumentException("Not found"));
+
         TableHistory tableHistory = TableHistory.builder()
                 .tableNumber(tableNumber)
                 .description(description.toString())
                 .type("ORDER")
+                .uuid(table.getUuid())
                 .build();
 
         tableHistoryRepository.save(tableHistory);
@@ -53,11 +59,16 @@ public class TableHistoryServiceImpl implements TableHistoryService {
         return true;
     }
 
+    private String generateRedisKey(Integer tableNumber) {
+        return "table:" + tableNumber;
+    }
+
     @Override
     @Transactional
     public boolean createTableHistory(TableDto tableDto, String type) {
         String tableNumber = tableDto.getNumber();
         tableNumber = tableNumber.replace("table:", "");
+
 
         //description에 들어가야 하는 것: table 상태 변경 내용, table 이용 시간 추가
         StringBuilder description = new StringBuilder();
@@ -69,6 +80,7 @@ public class TableHistoryServiceImpl implements TableHistoryService {
                     .tableNumber(Integer.valueOf(tableNumber))
                     .type("TABLE")
                     .description(description.toString())
+                    .uuid(tableDto.getUuid())
                     .build();
 
             tableHistoryRepository.save(tableHistory);
@@ -79,6 +91,7 @@ public class TableHistoryServiceImpl implements TableHistoryService {
                     .tableNumber(Integer.valueOf(tableNumber))
                     .type("TABLE")
                     .description(description.toString())
+                    .uuid(tableDto.getUuid())
                     .build();
 
             tableHistoryRepository.save(tableHistory);
@@ -90,6 +103,7 @@ public class TableHistoryServiceImpl implements TableHistoryService {
                     .tableNumber(Integer.valueOf(tableNumber))
                     .type("TABLE")
                     .description(description.toString())
+                    .uuid(tableDto.getUuid())
                     .build();
 
             tableHistoryRepository.save(tableHistory);

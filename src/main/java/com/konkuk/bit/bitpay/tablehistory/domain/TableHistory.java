@@ -32,8 +32,8 @@ public class TableHistory {
     @Column(name = "table_history_description")
     private String description;
 
-    @Column(name = "uuid")
-    private UUID uuid;
+    @Column(name = "table_history_uuid")
+    private String uuid;
 
     @PrePersist
     public void timestamp() {

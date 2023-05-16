@@ -13,7 +13,7 @@ public class TableHistoryDto {
     private LocalDateTime timestamp;
     private String type;
     private String description;
-    private UUID uuid;
+    private String uuid;
 
     public TableHistoryDto(TableHistory source) {
         this.id = source.getId();

@@ -40,7 +40,6 @@ public class TableInitializer implements CommandLineRunner {
                     .build();
             Table save = tableRepository.save(table);
             TableDto tableDto = convertToTableDto(save);
-            tableHistoryService.createTableHistory(tableDto, "ALL");
         }
     }
 
