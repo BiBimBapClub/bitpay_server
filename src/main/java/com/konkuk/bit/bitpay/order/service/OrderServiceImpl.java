@@ -95,9 +95,9 @@ public class OrderServiceImpl implements OrderService {
             totalPrice += quantity * menu.getPrice();
         }
 
-        if (tableService.isFirstOrder(tableNumber) && totalPrice < 14000) {
-            throw new IllegalArgumentException("첫 주문은 14000원 이상이어야 합니다");
-        }
+//        if (tableService.isFirstOrder(tableNumber) && totalPrice < 14000) {
+//            throw new IllegalArgumentException("첫 주문은 14000원 이상이어야 합니다");
+//        }
 
         order.setDetailList(detailList);
         order.setTotalPrice(totalPrice);
